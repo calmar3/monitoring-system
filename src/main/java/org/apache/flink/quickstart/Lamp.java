@@ -6,22 +6,22 @@ package org.apache.flink.quickstart;
 public class Lamp {
 
 
-    private long id;
+    private long lampId;
     private double consumption;
 
     public Lamp() {}
 
-    public Lamp(long id, double consumption){
-        this.id = id;
+    public Lamp(long lampId, double consumption){
+        this.lampId = lampId;
         this.consumption = consumption;
     }
 
     public long getId() {
-        return id;
+        return lampId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setId(long lampId) {
+        this.lampId = lampId;
     }
 
     public double getConsumption() {
@@ -38,7 +38,7 @@ public class Lamp {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id).append(",");
+        sb.append(lampId).append(",");
         sb.append(consumption);
 
         return sb.toString();
@@ -57,7 +57,7 @@ public class Lamp {
         Lamp ride = new Lamp();
 
         try {
-            ride.id = Long.parseLong(tokens[0]);
+            ride.lampId = Long.parseLong(tokens[0]);
             ride.consumption = Double.parseDouble(tokens[1]);
 
         } catch (NumberFormatException nfe) {

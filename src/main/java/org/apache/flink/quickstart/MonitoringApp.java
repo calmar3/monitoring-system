@@ -27,9 +27,17 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
+import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
+import org.apache.flink.types.LongValue;
 import org.apache.flink.util.Collector;
 
 import java.util.ArrayList;
@@ -113,22 +121,60 @@ public class MonitoringApp {
 		// assign a timestamp extractor to the consumer
 		//consumer.assignTimestampsAndWatermarks(new LampTSExtractor());
 
+
+
 		// create a Lamp data stream
-		DataStream<Lamp> lamps = env.addSource(consumer);
+		DataStream<Lamp> lampStream = env.addSource(consumer);
 
-		KeyedStream<Lamp,Tuple> keyedLamps = lamps.keyBy("id");
 
-		DataStream<Lamp> lampsWithAvgCons = keyedLamps.reduce(new ReduceFunction<Lamp>() {
-				@Override
-				public Lamp reduce(Lamp l1, Lamp l2) {
-					Lamp temp = new Lamp();
-					temp.setId(l1.getId());
-					temp.setConsumption((l1.getConsumption() + l2.getConsumption()) / 2 );
-					return temp;
+
+
+
+
+		WindowedStream windowedStream = lampStream.keyBy(new LampKey()).window(TumblingProcessingTimeWindows.of(Time.seconds(3)));
+
+		DataStream<Lamp> outputStream = windowedStream.apply(new WindowFunction<Lamp, Lamp, Long, Window>() {
+			public void apply (Long key,
+							   Window window,
+							   Iterable<Lamp> input,
+							   Collector<Lamp> out) throws Exception {
+				double totalConsumption = 0;
+				int n = 0;
+				for (Lamp tempLamp: input) {
+					totalConsumption += tempLamp.getConsumption();
+					n++;
 				}
+				System.out.print(totalConsumption);
+				out.collect(new Lamp(key, totalConsumption/n));
+			}
 		});
 
-        lampsWithAvgCons.print();
+
+		//System.out.println("STO PER STAMPAREEEEE");
+
+		outputStream.print();
+
+
+
+		/*
+
+		DataStream<Lamp> lampsWithAvgCons = lampStream.keyBy(new LampKey()).reduce(new ReduceFunction<Lamp>() {
+			@Override
+			public Lamp reduce(Lamp l1, Lamp l2) {
+				Lamp temp = new Lamp();
+				temp.setId(l1.getId());
+				temp.setConsumption((l1.getConsumption() + l2.getConsumption()) / 2 );
+				return temp;
+			}
+		});
+
+
+
+		lampsWithAvgCons.print();
+
+*/
+
+
 
 
 
