@@ -25,15 +25,14 @@ public class LampSchema implements DeserializationSchema<Lamp>, SerializationSch
 
         String jsonInString = new String("");
         try {
+
             jsonInString = mapper.writeValueAsString(element);
-            System.out.println(jsonInString);
             return jsonInString.getBytes();
 
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        finally {
-            return jsonInString.getBytes();
+
+            return null;
+
         }
 
     }
@@ -45,11 +44,20 @@ public class LampSchema implements DeserializationSchema<Lamp>, SerializationSch
         this.mapper = new ObjectMapper();
         Lamp lamp = new Lamp();
         try {
+
             lamp = this.mapper.readValue(jsonInString, Lamp.class);
-        } catch (IOException e) {
-            e.printStackTrace();
+            return lamp;
+
+        }  catch (IOException e) {
+
+            /**
+             * .readValue catch exception over any kind of data (double, int, objects ecc ecc)
+             * return null value to discard invalid tuple
+             */
+            return null;
+
         }
-        return lamp;
+
     }
 
     @Override

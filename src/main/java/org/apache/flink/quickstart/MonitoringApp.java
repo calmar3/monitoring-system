@@ -18,30 +18,17 @@ package org.apache.flink.quickstart;
  * limitations under the License.
  */
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
-import org.apache.flink.types.LongValue;
 import org.apache.flink.util.Collector;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 
@@ -74,6 +61,15 @@ public class MonitoringApp {
 	public static void main(String[] args) throws Exception {
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        /**
+         * Unsafe Code
+         * If we want to implement avl, this object will be loaded at start
+         * from database
+         */
+        LampsAvl.getInstance().put(new Long(3),3);
+        LampsAvl.getInstance().put(new Long(2),2);
+        LampsAvl.getInstance().put(new Long(1),1);
 
 		//Da capire utilizzo
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
@@ -124,14 +120,13 @@ public class MonitoringApp {
 
 
 		// create a Lamp data stream
+
 		DataStream<Lamp> lampStream = env.addSource(consumer);
 
+		DataStream<Lamp> filteredById = lampStream.filter(new FilterByLamp()).setParallelism(1);
 
 
-
-
-
-		WindowedStream windowedStream = lampStream.keyBy(new LampKey()).window(TumblingProcessingTimeWindows.of(Time.seconds(3)));
+		WindowedStream windowedStream = filteredById.keyBy(new LampKey()).window(TumblingProcessingTimeWindows.of(Time.seconds(3)));
 
 		DataStream<Lamp> outputStream = windowedStream.apply(new WindowFunction<Lamp, Lamp, Long, Window>() {
 			public void apply (Long key,
@@ -149,8 +144,6 @@ public class MonitoringApp {
 			}
 		});
 
-
-		//System.out.println("STO PER STAMPAREEEEE");
 
 		outputStream.print();
 
