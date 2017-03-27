@@ -1,6 +1,7 @@
-package org.apache.flink.quickstart;
+package key;
 
 import org.apache.flink.api.java.functions.KeySelector;
+import model.Lamp;
 
 /**
  * Created by maurizio on 23/03/17.

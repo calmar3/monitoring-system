@@ -1,5 +1,6 @@
-package org.apache.flink.quickstart;
+package core;
 
+import model.Lamp;
 import org.apache.flink.api.common.functions.FilterFunction;
 
 /**

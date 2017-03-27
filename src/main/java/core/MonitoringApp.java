@@ -1,4 +1,4 @@
-package org.apache.flink.quickstart;
+package core;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -18,8 +18,13 @@ package org.apache.flink.quickstart;
  * limitations under the License.
  */
 
+import key.LampKey;
+import key.StreetKey;
+import model.Lamp;
+import model.Street;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
@@ -46,7 +51,7 @@ import java.util.Properties;
  * You will find the jar in
  * 		target/flink-java-project-0.1.jar
  * From the CLI you can then run
- * 		./bin/flink run -c org.apache.flink.quickstart.MonitoringApp target/flink-java-project-0.1.jar
+ * 		./bin/flink run -c MonitoringApp target/flink-java-project-0.1.jar
  *
  * For more information on the CLI see:
  *
@@ -56,24 +61,25 @@ public class MonitoringApp {
 
     private static final String LOCAL_ZOOKEEPER_HOST = "localhost:2181";
     private static final String LOCAL_KAFKA_BROKER = "localhost:9092";
-    public static final String LAMP_TOPIC = "lampInfo";
+    private static final String LAMP_TOPIC = "lampInfo";
 
 	public static void main(String[] args) throws Exception {
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        /**
+        /*
          * Unsafe Code
          * If we want to implement avl, this object will be loaded at start
          * from database
          */
-        LampsAvl.getInstance().put(new Long(3),3);
-        LampsAvl.getInstance().put(new Long(2),2);
-        LampsAvl.getInstance().put(new Long(1),1);
+        LampsAvl.getInstance().put(3L,3);
+        LampsAvl.getInstance().put(2L,2);
+        LampsAvl.getInstance().put(1L,1);
 
 		//Da capire utilizzo
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-		/**
+
+		/*
 		 * Here, you can start creating your execution plan for Flink.
 		 *
 		 * Start with getting some data from the environment, like
@@ -125,29 +131,47 @@ public class MonitoringApp {
 
 		DataStream<Lamp> filteredById = lampStream.filter(new FilterByLamp()).setParallelism(1);
 
-
 		WindowedStream windowedStream = filteredById.keyBy(new LampKey()).window(TumblingProcessingTimeWindows.of(Time.seconds(3)));
 
-		DataStream<Lamp> outputStream = windowedStream.apply(new WindowFunction<Lamp, Lamp, Long, Window>() {
+		SingleOutputStreamOperator outputStream = windowedStream.apply(new WindowFunction<Lamp, Lamp, Long, Window>() {
 			public void apply (Long key,
 							   Window window,
 							   Iterable<Lamp> input,
 							   Collector<Lamp> out) throws Exception {
 				double totalConsumption = 0;
 				int n = 0;
+				Lamp lamp = null;
 				for (Lamp tempLamp: input) {
+				    if (lamp == null)
+				        lamp = tempLamp;
 					totalConsumption += tempLamp.getConsumption();
 					n++;
 				}
-				System.out.print(totalConsumption);
-				out.collect(new Lamp(key, totalConsumption/n));
+				out.collect(new Lamp(key, totalConsumption/n,lamp.getAddress()));
 			}
 		});
 
 
 		outputStream.print();
 
+		WindowedStream streetWindowedStream = outputStream.keyBy(new StreetKey()).window(TumblingProcessingTimeWindows.of(Time.seconds(3)));
 
+		SingleOutputStreamOperator streetOutputStream = streetWindowedStream.apply(new WindowFunction<Lamp, Street, String, Window>() {
+			public void apply (String key,
+							   Window window,
+							   Iterable<Lamp> input,
+							   Collector<Street> out) throws Exception {
+				double totalConsumption = 0;
+				int n = 0;
+				for (Lamp tempLamp: input) {
+					totalConsumption += tempLamp.getConsumption();
+					n++;
+				}
+				out.collect(new Street(key, totalConsumption/n));
+			}
+		});
+
+		streetOutputStream.print();
 
 		/*
 

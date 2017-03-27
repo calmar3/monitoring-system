@@ -1,4 +1,4 @@
-package org.apache.flink.quickstart;
+package core;
 
 import java.util.HashMap;
 

@@ -1,4 +1,4 @@
-package org.apache.flink.quickstart;
+package core;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -18,19 +18,14 @@ package org.apache.flink.quickstart;
  * limitations under the License.
  */
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import model.Lamp;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
-import org.apache.flink.util.Collector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 
 /**
@@ -47,7 +42,7 @@ import java.util.Properties;
  * You will find the jar in
  * 		target/flink-java-project-0.1.jar
  * From the CLI you can then run
- * 		./bin/flink run -c org.apache.flink.quickstart.MonitoringApp target/flink-java-project-0.1.jar
+ * 		./bin/flink run -c MonitoringApp target/flink-java-project-0.1.jar
  *
  * For more information on the CLI see:
  *
@@ -115,13 +110,13 @@ public class WriteToKafkaApp {
         //write to KAFKA
 
 		List<Lamp> data = new ArrayList<>();
-        data.add(new Lamp(1,10));
-        data.add(new Lamp(1,20));
-        data.add(new Lamp(3,12.1));
-        data.add(new Lamp(1,10));
-        data.add(new Lamp(2,1));
-        data.add(new Lamp(2,9));
-        data.add(new Lamp(1,20));
+        data.add(new Lamp(1,10,"a"));
+        data.add(new Lamp(1,20,"a"));
+        data.add(new Lamp(3,12.1,"b"));
+        data.add(new Lamp(1,10,"a"));
+        data.add(new Lamp(2,1,"b"));
+        data.add(new Lamp(2,9,"b"));
+        data.add(new Lamp(1,20,"a"));
 
 
 		DataStream<Lamp> stream = env.fromCollection(data);

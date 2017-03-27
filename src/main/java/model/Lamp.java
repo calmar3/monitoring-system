@@ -1,4 +1,4 @@
-package org.apache.flink.quickstart;
+package model;
 
 /**
  * Created by maurizio on 21/03/17.
@@ -8,12 +8,19 @@ public class Lamp {
 
     private long lampId;
     private double consumption;
+    private String address;
 
     public Lamp() {}
 
     public Lamp(long lampId, double consumption){
         this.lampId = lampId;
         this.consumption = consumption;
+    }
+
+    public Lamp(long lampId, double consumption,String address){
+        this.lampId = lampId;
+        this.consumption = consumption;
+        this.address = address;
     }
 
     public long getId() {
@@ -38,8 +45,9 @@ public class Lamp {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(lampId).append(",");
-        sb.append(consumption);
+        sb.append(this.lampId).append(",");
+        sb.append(this.consumption).append(",");
+        sb.append(this.address);
 
         return sb.toString();
     }
@@ -67,4 +75,11 @@ public class Lamp {
         return ride;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }
