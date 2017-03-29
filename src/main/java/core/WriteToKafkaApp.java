@@ -18,11 +18,11 @@ package core;
  * limitations under the License.
  */
 
+import control.EnvConfigurator;
 import model.Lamp;
-import org.apache.flink.streaming.api.TimeCharacteristic;
+import utils.connector.KafkaConfigurator;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,60 +55,10 @@ public class WriteToKafkaApp {
     public static final String LAMP_TOPIC = "lampInfo";
 
     public static void main(String[] args) throws Exception {
-        // set up the streaming execution environment
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        //Da capire utilizzo
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-        /**
-         * Here, you can start creating your execution plan for Flink.
-         *
-         * Start with getting some data from the environment, like
-         * 	env.readTextFile(textPath);
-         *
-         * then, transform the resulting DataStream<String> using operations
-         * like
-         * 	.filter()
-         * 	.flatMap()
-         * 	.join()
-         * 	.coGroup()
-         *
-         * and many more.
-         * Have a look at the programming guide for the Java API:
-         *
-         * http://flink.apache.org/docs/latest/apis/streaming/index.html
-         *
-         */
+        final StreamExecutionEnvironment env = EnvConfigurator.setupExecutionEnvironment();
 
-
-
-
-
-        /*
-
-        ESEMPIO DI PROVA CON TUPLE
-
-		DataStream<Tuple2<Integer, Double>> stream = env.fromElements(new Tuple2<Integer,Double>(new Integer(1),12.5), new Tuple2<Integer,Double>(new Integer(2),15.7), new Tuple2<Integer,Double>(new Integer(3),11.1));
-
-
-		DataStream<Tuple2<Integer, Double>> adaptConsumption = stream
-
-                .flatMap(new FlatMapFunction<Tuple2<Integer, Double>, Tuple2<Integer, Double>>() {
-			@Override
-			public void flatMap(Tuple2<Integer, Double> lampInfo, Collector<Tuple2<Integer, Double>> out) throws Exception {
-				lampInfo.f1 = lampInfo.f1*2;
-			    out.collect(lampInfo);
-			}
-		});
-
-
-		adaptConsumption.print()
-        */
-
-
-
-        //write to KAFKA
-
+        // generate data
 		List<Lamp> data = new ArrayList<>();
         data.add(new Lamp(1,10,"a"));
         data.add(new Lamp(1,20,"a"));
@@ -119,15 +69,10 @@ public class WriteToKafkaApp {
         data.add(new Lamp(1,20,"a"));
 
 
-		DataStream<Lamp> stream = env.fromCollection(data);
-        // write the filtered data to a Kafka sink
-        stream.addSink(new FlinkKafkaProducer010<Lamp>(
-                LOCAL_KAFKA_BROKER,
-                LAMP_TOPIC,
-                new LampSchema()
-                ));
+		DataStream<Lamp> lampStream = env.fromCollection(data);
 
-		System.out.println(stream.print().toString());
+		// emits the stream throught kafka sink
+        KafkaConfigurator.getProducer(lampStream);
 
         // execute program
         env.execute("Flink Streaming Java API Skeleton");

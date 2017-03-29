@@ -1,5 +1,6 @@
-package core;
+package operator.filter;
 
+import utils.structure.LampsAvl;
 import model.Lamp;
 import org.apache.flink.api.common.functions.FilterFunction;
 

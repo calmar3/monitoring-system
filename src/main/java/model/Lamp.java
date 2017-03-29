@@ -40,7 +40,9 @@ public class Lamp {
     }
 
 
-
+    public long eventTime() {
+        return 10;
+    }
 
 
     public String toString() {
@@ -82,4 +84,5 @@ public class Lamp {
     public void setAddress(String address) {
         this.address = address;
     }
+
 }

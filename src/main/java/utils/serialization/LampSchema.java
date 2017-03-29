@@ -1,4 +1,4 @@
-package core;
+package utils.serialization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,10 +43,10 @@ public class LampSchema implements DeserializationSchema<Lamp>, SerializationSch
 
         String jsonInString = new String(message);
         this.mapper = new ObjectMapper();
-        Lamp lamp = new Lamp();
+        //Lamp lamp = new Lamp();
         try {
 
-            lamp = this.mapper.readValue(jsonInString, Lamp.class);
+            Lamp lamp = this.mapper.readValue(jsonInString, Lamp.class);
             return lamp;
 
         }  catch (IOException e) {

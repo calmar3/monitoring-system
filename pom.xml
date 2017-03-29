@@ -346,7 +346,7 @@ under the License.
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<source>1.8</source>
+						<connector>1.8</connector>
 						<target>1.8</target>
 						<compilerId>jdt</compilerId>
 					</configuration>

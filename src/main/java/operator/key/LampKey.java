@@ -1,4 +1,4 @@
-package key;
+package operator.key;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import model.Lamp;
