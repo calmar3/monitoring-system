@@ -11,7 +11,6 @@ public final class FilterByLamp implements FilterFunction<Lamp> {
 
     private static final long serialVersionUID = 1L;
 
-
     @Override
     public boolean filter(Lamp lamp) throws Exception {
 
@@ -29,6 +28,4 @@ public final class FilterByLamp implements FilterFunction<Lamp> {
         else
             return true;
     }
-
-
-    }
+}

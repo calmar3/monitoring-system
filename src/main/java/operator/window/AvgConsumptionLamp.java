@@ -2,6 +2,7 @@ package operator.window;
 
 import model.Lamp;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.util.Collector;
 
@@ -10,10 +11,10 @@ import org.apache.flink.util.Collector;
  */
 
 //WindowFunction<input, output, key, window>
-public class AvgConsumptionLamp implements WindowFunction<Lamp, Lamp, Long, Window> {
+public class AvgConsumptionLamp implements WindowFunction<Lamp, Lamp, Long, TimeWindow> {
 
     @Override
-    public void apply (Long key, Window window, Iterable<Lamp> input, Collector<Lamp> out) throws Exception {
+    public void apply (Long key, TimeWindow window, Iterable<Lamp> input, Collector<Lamp> out) throws Exception {
 
         double totalConsumption = 0;
         int n = 0;

@@ -12,7 +12,9 @@ public class EnvConfigurator {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        //env.getConfig().setAutoWatermarkInterval(1000000);
+        // generate a Watermark every second
+        env.getConfig().setAutoWatermarkInterval(1000);
+
         //env.setBufferTimeout(config.getBufferTimeout());
 
         return env;

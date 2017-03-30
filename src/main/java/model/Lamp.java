@@ -9,6 +9,8 @@ public class Lamp {
     private long lampId;
     private double consumption;
     private String address;
+    private long timestamp;
+
 
     public Lamp() {}
 
@@ -21,6 +23,13 @@ public class Lamp {
         this.lampId = lampId;
         this.consumption = consumption;
         this.address = address;
+    }
+
+    public Lamp(long lampId, double consumption,String address, long timestamp){
+        this.lampId = lampId;
+        this.consumption = consumption;
+        this.address = address;
+        this.timestamp = timestamp;
     }
 
     public long getId() {
@@ -39,9 +48,12 @@ public class Lamp {
         this.consumption = consumption;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
 
-    public long eventTime() {
-        return 10;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
 
