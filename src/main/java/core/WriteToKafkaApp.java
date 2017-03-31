@@ -20,6 +20,7 @@ public class WriteToKafkaApp {
 
         final StreamExecutionEnvironment env = EnvConfigurator.setupExecutionEnvironment();
 
+
         // generate data
 		List<Lamp> data = new ArrayList<>();
         data.add(new Lamp(1,10,"a", Time.now()));
@@ -29,7 +30,7 @@ public class WriteToKafkaApp {
         data.add(new Lamp(1,10,"a", Time.now()));
         data.add(new Lamp(2,1,"b", Time.now()));
         data.add(new Lamp(2,9,"b", Time.now()));
-        data.add(new Lamp(1,20,"a", Time.now()));
+        data.add(new Lamp(1,20,"a", Time.now() + 10000));
 
         // Final watermark, see https://issues.apache.org/jira/browse/FLINK-3121
         data.add(new Lamp(0, 0,"", Long.MAX_VALUE));

@@ -3,8 +3,9 @@ package core;
 import control.EnvConfigurator;
 import operator.key.StreetKey;
 import operator.time.LampTSExtractor;
+import operator.window.AvgReduceFunction;
 import operator.window.AvgConsumptionGlobal;
-import operator.window.AvgConsumptionLamp;
+import operator.window.LampWindowFunction;
 import operator.window.AvgConsumptionStreet;
 import org.apache.flink.streaming.api.datastream.AllWindowedStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
@@ -54,9 +55,9 @@ public class MonitoringApp {
 
 
 		// average consumption by lampId
-		WindowedStream windowedStream = filteredById.keyBy(new LampKey()).timeWindow(Time.seconds(3));
+		WindowedStream windowedStream = filteredById.keyBy(new LampKey()).timeWindow(Time.seconds(3), Time.seconds(1));
 
-		SingleOutputStreamOperator outputStream = windowedStream.apply(new AvgConsumptionLamp());
+		SingleOutputStreamOperator outputStream = windowedStream.reduce(new AvgReduceFunction(), new LampWindowFunction());
 
 		outputStream.print();
 
