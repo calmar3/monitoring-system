@@ -8,7 +8,6 @@ import org.apache.flink.streaming.api.datastream.AllWindowedStream;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 import utils.connector.KafkaConfigurator;
 import operator.filter.FilterByLamp;
@@ -41,7 +40,7 @@ public class MonitoringApp {
 
 
 		// get a kafka consumer
-		FlinkKafkaConsumer09<Lamp> kafkaConsumer = KafkaConfigurator.getConsumer();
+		FlinkKafkaConsumer010<Lamp> kafkaConsumer = KafkaConfigurator.getConsumer();
 
 		// assign a timestamp extractor to the consumer
 		FlinkKafkaConsumerBase<Lamp> kafkaConsumerTS = kafkaConsumer.assignTimestampsAndWatermarks(new LampTSExtractor());

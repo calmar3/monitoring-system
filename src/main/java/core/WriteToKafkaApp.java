@@ -8,14 +8,9 @@ import utils.connector.KafkaConfigurator;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class WriteToKafkaApp {
-
-    private static final String LOCAL_ZOOKEEPER_HOST = "localhost:2181";
-    private static final String LOCAL_KAFKA_BROKER = "localhost:9092";
-    public static final String LAMP_TOPIC = "lampInfo";
 
     public static void main(String[] args) throws Exception {
 
@@ -25,7 +20,7 @@ public class WriteToKafkaApp {
             @Override
             public void run(SourceContext<Lamp> sourceContext) throws Exception {
                 int i = 0;
-                while(i < 3) {
+                while(i < 30) {
                     sourceContext.collect(new Lamp(1,10*(i+1),"a", Time.now() + i*1000));
                     i++;
                 }
