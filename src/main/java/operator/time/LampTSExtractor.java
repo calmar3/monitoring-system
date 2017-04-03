@@ -2,6 +2,7 @@ package operator.time;
 
 import model.Lamp;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
+import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
 /**
@@ -12,7 +13,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
  */
 public class LampTSExtractor extends BoundedOutOfOrdernessTimestampExtractor<Lamp> {
 
-    private static final long MAX_EVENT_DELAY = 1000000 ;
+    private static final long MAX_EVENT_DELAY = 10 ;
 
     public LampTSExtractor() {
         super(Time.seconds(MAX_EVENT_DELAY));
@@ -20,6 +21,7 @@ public class LampTSExtractor extends BoundedOutOfOrdernessTimestampExtractor<Lam
 
     @Override
     public long extractTimestamp(Lamp lamp) {
+            //System.out.println(lamp.getTimestamp());
             return lamp.getTimestamp();
     }
 }

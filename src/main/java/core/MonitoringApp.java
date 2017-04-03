@@ -3,13 +3,12 @@ package core;
 import control.EnvConfigurator;
 import operator.key.StreetKey;
 import operator.time.LampTSExtractor;
-import operator.window.AvgReduceFunction;
-import operator.window.AvgConsumptionGlobal;
-import operator.window.LampWindowFunction;
-import operator.window.AvgConsumptionStreet;
+import operator.window.*;
 import org.apache.flink.streaming.api.datastream.AllWindowedStream;
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 import utils.connector.KafkaConfigurator;
 import operator.filter.FilterByLamp;
@@ -20,6 +19,8 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
+
+
 import utils.structure.LampsAvl;
 
 public class MonitoringApp {
@@ -40,24 +41,25 @@ public class MonitoringApp {
 
 
 		// get a kafka consumer
-		FlinkKafkaConsumer010<Lamp> kafkaConsumer = KafkaConfigurator.getConsumer();
+		FlinkKafkaConsumer09<Lamp> kafkaConsumer = KafkaConfigurator.getConsumer();
 
 		// assign a timestamp extractor to the consumer
 		FlinkKafkaConsumerBase<Lamp> kafkaConsumerTS = kafkaConsumer.assignTimestampsAndWatermarks(new LampTSExtractor());
 
+
 		// add source
 		DataStream<Lamp> lampStream = env.addSource(kafkaConsumerTS);
 
-		// filter data
-		DataStream<Lamp> filteredById = lampStream.filter(new FilterByLamp()).setParallelism(1);
 
+		// filter data
+		DataStream<Lamp> filteredById = lampStream.filter(new FilterByLamp());
 
 
 
 		// average consumption by lampId
-		WindowedStream windowedStream = filteredById.keyBy(new LampKey()).timeWindow(Time.seconds(3), Time.seconds(1));
+		WindowedStream windowedStream = filteredById.keyBy(new LampKey()).timeWindow(Time.milliseconds(10000));
 
-		SingleOutputStreamOperator outputStream = windowedStream.reduce(new AvgReduceFunction(), new LampWindowFunction());
+		SingleOutputStreamOperator outputStream = windowedStream.apply(new AvgConsumptionLamp());/*.allowedLateness(Time.seconds(1))*/
 
 		outputStream.print();
 

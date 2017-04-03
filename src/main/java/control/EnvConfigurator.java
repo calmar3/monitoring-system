@@ -15,8 +15,6 @@ public class EnvConfigurator {
         // generate a Watermark every second
         env.getConfig().setAutoWatermarkInterval(1000);
 
-        //env.setBufferTimeout(config.getBufferTimeout());
-
         return env;
     }
 

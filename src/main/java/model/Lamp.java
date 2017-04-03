@@ -62,6 +62,7 @@ public class Lamp {
         sb.append(this.lampId).append(",");
         sb.append(this.consumption).append(",");
         sb.append(this.address);
+        sb.append(" timestamp : ").append(this.timestamp);
 
         return sb.toString();
     }

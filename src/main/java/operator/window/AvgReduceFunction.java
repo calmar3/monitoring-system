@@ -13,8 +13,9 @@ public class AvgReduceFunction implements ReduceFunction<Lamp> {
     public Lamp reduce(Lamp l1, Lamp l2) {
 
         N++;
-        //System.out.println("Reduce N=" + N + "  consumptionl1=" + l1.getConsumption() + "\n");
-        //System.out.println("Reduce N=" + N + "  consumptionl2=" + l2.getConsumption() + "\n");
+        //System.out.println("Reduce N=" + N + "  consumptionl1=" + l1.getConsumption() + " timestamp = " + l1.getTimestamp() + "\n");
+        //System.out.println("Reduce N=" + N + "  consumptionl2=" + l2.getConsumption() + " timestamp = " + l2.getTimestamp() + "\n");
+        //l1.setConsumption(((l1.getConsumption() * (N-1) + l2.getConsumption()) / N));
         l1.setConsumption(((l1.getConsumption() * (N-1) + l2.getConsumption()) / N));
         //System.out.println("Reduce N=" + N + "  consumptionl1Calculator=" + l1.getConsumption() + "\n");
         return l1;

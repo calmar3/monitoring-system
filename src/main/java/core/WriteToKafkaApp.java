@@ -2,6 +2,7 @@ package core;
 
 import control.EnvConfigurator;
 import model.Lamp;
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.hadoop.util.Time;
 import utils.connector.KafkaConfigurator;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -20,22 +21,21 @@ public class WriteToKafkaApp {
 
         final StreamExecutionEnvironment env = EnvConfigurator.setupExecutionEnvironment();
 
+		DataStream<Lamp> lampStream = env.addSource(new SourceFunction<Lamp>() {
+            @Override
+            public void run(SourceContext<Lamp> sourceContext) throws Exception {
+                int i = 0;
+                while(i < 3) {
+                    sourceContext.collect(new Lamp(1,10*(i+1),"a", Time.now() + i*1000));
+                    i++;
+                }
+            }
 
-        // generate data
-		List<Lamp> data = new ArrayList<>();
-        data.add(new Lamp(1,10,"a", Time.now()));
-        data.add(new Lamp(1,20,"a", Time.now()));
-        data.add(new Lamp(1,20,"a", Time.now()));
-        data.add(new Lamp(3,12.1,"b", Time.now()));
-        data.add(new Lamp(1,10,"a", Time.now()));
-        data.add(new Lamp(2,1,"b", Time.now()));
-        data.add(new Lamp(2,9,"b", Time.now()));
-        data.add(new Lamp(1,20,"a", Time.now() + 10000));
+            @Override
+            public void cancel() {
 
-        // Final watermark, see https://issues.apache.org/jira/browse/FLINK-3121
-        data.add(new Lamp(0, 0,"", Long.MAX_VALUE));
-
-		DataStream<Lamp> lampStream = env.fromCollection(data);
+            }
+        });
 
 		// emits the stream throught kafka sink
         KafkaConfigurator.getProducer(lampStream);

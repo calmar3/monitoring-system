@@ -25,7 +25,10 @@ public final class FilterByLamp implements FilterFunction<Lamp> {
          */
         if (LampsAvl.getInstance().get(new Long(lamp.getId())) == null)
             return false;
-        else
+        else {
+            //lamp.toString();
             return true;
+        }
+
     }
 }

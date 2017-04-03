@@ -11,16 +11,21 @@ import org.apache.flink.util.Collector;
  */
 
 //WindowFunction<input, output, key, window>
-public class LampWindowFunction implements WindowFunction<Lamp, Lamp, Long, TimeWindow> {
+public class AvgConsumptionLamp implements WindowFunction<Lamp, Lamp, Long, TimeWindow> {
 
     @Override
     public void apply (Long key, TimeWindow window, Iterable<Lamp> input, Collector<Lamp> out) throws Exception {
 
-        Lamp lampAvg = input.iterator().next();
-        //System.out.println("WindowFunction, lampAvgconsumption = " + lampAvg.getConsumption());
-        out.collect(lampAvg);
-
-
-
+        double totalConsumption = 0;
+        int n = 0;
+        Lamp lamp = null;
+        for (Lamp tempLamp: input) {
+            if (lamp == null)
+                lamp = tempLamp;
+            totalConsumption += tempLamp.getConsumption();
+            System.out.println(tempLamp.toString());
+            n++;
+        }
+        out.collect(new Lamp(key, totalConsumption/n,lamp.getAddress()));
     }
 }
