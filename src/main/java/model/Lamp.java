@@ -1,5 +1,7 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * Created by maurizio on 21/03/17.
  */
@@ -10,13 +12,21 @@ public class Lamp {
     private double consumption;
     private String address;
     private long timestamp;
-
+    private long lastSubstitutionDate;
+    private long residualLifeTime;
 
     public Lamp() {}
 
     public Lamp(long lampId, double consumption){
         this.lampId = lampId;
         this.consumption = consumption;
+    }
+
+    public Lamp(long lampId, long timestamp, long lastSubstitutionDate) {
+        this.lampId = lampId;
+        this.timestamp = timestamp;
+        this.lastSubstitutionDate = lastSubstitutionDate;
+        this.residualLifeTime = timestamp - lastSubstitutionDate;
     }
 
     public Lamp(long lampId, double consumption,String address){
@@ -32,11 +42,11 @@ public class Lamp {
         this.timestamp = timestamp;
     }
 
-    public long getId() {
+    public long getLampId() {
         return lampId;
     }
 
-    public void setId(long lampId) {
+    public void setLampId(long lampId) {
         this.lampId = lampId;
     }
 
@@ -48,6 +58,14 @@ public class Lamp {
         this.consumption = consumption;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
@@ -56,6 +74,21 @@ public class Lamp {
         this.timestamp = timestamp;
     }
 
+    public long getLastSubstitutionDate() {
+        return lastSubstitutionDate;
+    }
+
+    public void setLastSubstitutionDate(long lastSubstitutionDate) {
+        this.lastSubstitutionDate = lastSubstitutionDate;
+    }
+
+    public long getResidualLifeTime() {
+        return residualLifeTime;
+    }
+
+    public void setResidualLifeTime(long residualLifeTime) {
+        this.residualLifeTime = residualLifeTime;
+    }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -66,8 +99,6 @@ public class Lamp {
 
         return sb.toString();
     }
-
-
 
 
     public static Lamp fromString(String line) {
@@ -89,13 +120,4 @@ public class Lamp {
 
         return ride;
     }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
 }

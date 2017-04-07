@@ -1,4 +1,4 @@
-package operator.window;
+package operator.window.olgWindowFunction;
 
 import model.Lamp;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
@@ -26,6 +26,6 @@ public class AvgConsumptionLamp implements WindowFunction<Lamp, Lamp, Long, Time
             System.out.println(tempLamp.toString());
             n++;
         }
-        out.collect(new Lamp(key, totalConsumption/n,lamp.getAddress()));
+        out.collect(new Lamp(key, totalConsumption/n,lamp.getAddress(),0l));
     }
 }

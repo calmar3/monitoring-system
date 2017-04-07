@@ -1,4 +1,4 @@
-package operator.window;
+package operator.window.olgWindowFunction;
 
 import model.Lamp;
 import model.Street;
@@ -22,6 +22,6 @@ public class AvgConsumptionStreet implements WindowFunction<Lamp, Street, String
             totalConsumption += tempLamp.getConsumption();
             n++;
         }
-        out.collect(new Street(key, totalConsumption/n));
+        out.collect(new Street(key, totalConsumption/n, 0));
     }
 }

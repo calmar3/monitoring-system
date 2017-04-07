@@ -1,14 +1,30 @@
 package core;
 
 import control.EnvConfigurator;
+import model.Street;
+import operator.filter.ThresholdFilter;
+import operator.filter.UpdateGlobalRankFilter;
 import operator.key.StreetKey;
+import operator.merger.RankMerger;
+import operator.ranker.LampRanker;
 import operator.time.LampTSExtractor;
+import operator.trigger.MyTrigger;
 import operator.window.*;
+import operator.window.olgWindowFunction.AvgConsumptionLamp;
+import operator.window.reduce.AvgReduceFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.AllWindowedStream;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.triggers.*;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
+import org.apache.flink.util.Collector;
 import utils.connector.KafkaConfigurator;
 import operator.filter.FilterByLamp;
 import operator.key.LampKey;
@@ -22,25 +38,40 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 
 import utils.structure.LampsAvl;
 
+import java.util.TreeSet;
+
 public class MonitoringApp {
+
+	//Ranking
+	private static final int MAX_RANK_SIZE = 3;
+	private static final long THRESHOLD = 1000;
+	private static final long WINDOW_SIZE = 10000;
+
+	//kafka topic
+	private static final String LAMP_TOPIC_CONSUMPTION = "lampInfo";
+	private static final String LAMP_TOPIC_RANKING= "rank";
+
 
 	public static void main(String[] args) throws Exception {
 
+
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = EnvConfigurator.setupExecutionEnvironment();
+
+
 
         /*
          * Unsafe Code
          * If we want to implement avl, this object will be loaded at start
          * from database
          */
-        LampsAvl.getInstance().put(3L,3);
-        LampsAvl.getInstance().put(2L,2);
-        LampsAvl.getInstance().put(1L,1);
+        //LampsAvl.getInstance().put(3L,3);
+        //LampsAvl.getInstance().put(2L,2);
+        //LampsAvl.getInstance().put(1L,1);
 
 
 		// get a kafka consumer
-		FlinkKafkaConsumer010<Lamp> kafkaConsumer = KafkaConfigurator.getConsumer();
+		FlinkKafkaConsumer010<Lamp> kafkaConsumer = KafkaConfigurator.getConsumer("lampInfo");
 
 		// assign a timestamp extractor to the consumer
 		FlinkKafkaConsumerBase<Lamp> kafkaConsumerTS = kafkaConsumer.assignTimestampsAndWatermarks(new LampTSExtractor());
@@ -55,33 +86,106 @@ public class MonitoringApp {
 
 
 
-		// average consumption by lampId
-		WindowedStream windowedStream = filteredById.keyBy(new LampKey()).timeWindow(Time.milliseconds(10000));
+/*
+		//non creo una classe perchè potrebbe non servirci più se cambiamo il modo in cui calcoliamo la media
+		DataStream<Tuple2<Lamp, Long>> addCountToLamp = filteredById.flatMap(new FlatMapFunction<Lamp, Tuple2<Lamp,Long>>() {
+			@Override
+			public void flatMap(Lamp value, Collector<Tuple2<Lamp,Long>> out){
+				out.collect(new Tuple2<>(value, (long) 1));
+			}
+		});
+*/
 
-		SingleOutputStreamOperator outputStream = windowedStream.apply(new AvgConsumptionLamp());/*.allowedLateness(Time.seconds(1))*/
+		/**
+		 * INSERT CODE FOR RANKING
+		 *
+		 */
+/*
+		// filter data by threshold
+		DataStream<Lamp> filteredByThreshold = filteredById.filter(new ThresholdFilter(THRESHOLD));
 
-		outputStream.print();
+		//filteredByThreshold.writeAsText("debug1");
+
+		// grouping by lamp id and windowing the stream
+		WindowedStream<Lamp, Long , TimeWindow> windowedStream = filteredByThreshold.keyBy(new LampKey()).timeWindow(Time.milliseconds(WINDOW_SIZE));
+
+		// compute partial rank
+		SingleOutputStreamOperator<TreeSet<Lamp>> partialRank = windowedStream.apply(new LampRanker(MAX_RANK_SIZE));
+
+		//partialRank.writeAsText("debug2");
+
+		// compute global rank
+		DataStream<TreeSet<Lamp>> globalRank = partialRank.flatMap(new RankMerger(MAX_RANK_SIZE)).setParallelism(1);
+
+		// filter not updated global rank
+		DataStream<TreeSet<Lamp>> updateGlobalRank = globalRank.filter(new UpdateGlobalRankFilter(MAX_RANK_SIZE)).setParallelism(1);
+
+		// publish result on Kafka topic
+		KafkaConfigurator.getProducerRank(updateGlobalRank);
+
+
+*/
+
+
+		/**
+		 * AVG CONSUMPTION FOR LAMP
+		 */
+
+		// average consumption for lamp (hours)
+		WindowedStream lampWindowedStreamHour = filteredById.keyBy(new LampKey()).timeWindow(Time.seconds(10));//.trigger(MyTrigger.create());
 
 
 
+		//SingleOutputStreamOperator avgConsLampStreamHour = lampWindowedStreamHour.apply(new AvgConsumptionLamp());
+		//SingleOutputStreamOperator outputStream = lampWindowedStreamHour.reduce(new AvgReduceFunction(), new LampWindowFunction());
+		SingleOutputStreamOperator avgConsLampStreamHour = lampWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new SumFoldFunction(), new LampWindowFunction());
+		avgConsLampStreamHour.print().setParallelism(1);
+
+
+
+		// average consumption for lamp (day)
+		//WindowedStream lampWindowedStreamDay = avgConsLampStreamHour.keyBy(new LampKey()).timeWindow(Time.minutes(1));
+		//SingleOutputStreamOperator avgConsLampStreamDay = lampWindowedStreamDay.fold(new Tuple2<>(null, (long) 0), new SumFoldFunction(), new LampWindowFunction());
+		//avgConsLampStreamDay.print().setParallelism(2);
+
+
+/*
+		// average consumption for lamp (week)
+		WindowedStream lampWindowedStreamWeek = avgConsLampStreamDay.keyBy(new LampKey()).timeWindow(Time.days(7));
+		DataStream<Lamp> avgConsLampStreamWeek = lampWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new SumFoldFunction(), new LampWindowFunction());
+		avgConsLampStreamDay.print();
+*/
+
+
+
+		/**
+		 * AVG CONSUMPTION FOR STREET
+		 */
+
+/*
 		// average consumption by street
-		WindowedStream streetWindowedStream = outputStream.keyBy(new StreetKey()).window(TumblingProcessingTimeWindows.of(Time.seconds(3)));
+		WindowedStream streetWindowedStream = avgConsLampStreamHour.keyBy(new StreetKey()).timeWindow(Time.seconds(10));
 
-		SingleOutputStreamOperator streetOutputStream = streetWindowedStream.apply(new AvgConsumptionStreet());
+		DataStream<Street> avgConsStreetStream = streetWindowedStream.fold(new Tuple2<>(null, (long) 0), new SumFoldFunction(), new StreetWindowFunction());
 
-		streetOutputStream.print();
+		avgConsStreetStream.print().setParallelism(3);
 
+*/
 
+		/**
+		 * AVG CONSUMPTION FOR CITY
+		 */
+
+/*
 
 
 		// global average consumption
-		AllWindowedStream cityWindowedStream = streetOutputStream.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(5)));
+		AllWindowedStream cityWindowedStream = avgConsStreetStream.timeWindowAll(Time.seconds(20));
 
-		SingleOutputStreamOperator cityOutputStream = cityWindowedStream.apply(new AvgConsumptionGlobal());
+		SingleOutputStreamOperator avgConsCityStream = cityWindowedStream.fold(new Tuple2<>(null, (long) 0), new SumFoldFunction(), new CityWindowFunction());
 
-		cityOutputStream.print();
-
-
+		avgConsCityStream.print();
+*/
 
 		/**
 		 * In questa parte finale ci andrebbe la parte di codice presente al momento

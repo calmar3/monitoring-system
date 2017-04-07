@@ -1,4 +1,4 @@
-package operator.window;
+package operator.window.olgWindowFunction;
 
 import model.Lamp;
 import model.Street;
@@ -25,5 +25,4 @@ public class AvgConsumptionGlobal implements AllWindowFunction<Street, Double, W
         }
         collector.collect (new Double(totalConsumption/n));
     }
-
 }

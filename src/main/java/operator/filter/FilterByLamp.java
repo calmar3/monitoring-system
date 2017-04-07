@@ -23,12 +23,14 @@ public final class FilterByLamp implements FilterFunction<Lamp> {
         /**
          * discard tuple not in avl
          */
-        if (LampsAvl.getInstance().get(new Long(lamp.getId())) == null)
+        /*if (LampsAvl.getInstance().get(new Long(lamp.getId())) == null)
             return false;
         else {
             //lamp.toString();
             return true;
-        }
+        }*/
+
+        return true;
 
     }
 }
