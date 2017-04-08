@@ -9,6 +9,8 @@ public class Street {
     private Double consumption;
     private long timestamp;
 
+    public Street() {}
+
     public Street(String id, Double consumption, long timestamp){
         this.id = id;
         this.consumption = consumption;

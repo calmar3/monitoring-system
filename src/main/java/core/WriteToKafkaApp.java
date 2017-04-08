@@ -24,36 +24,18 @@ public class WriteToKafkaApp {
 
         final StreamExecutionEnvironment env = EnvConfigurator.setupExecutionEnvironment();
 
-        /*
+
 		DataStream<Lamp> lampStream = env.addSource(new SourceFunction<Lamp>() {
             @Override
             public void run(SourceContext<Lamp> sourceContext) throws Exception {
                 int i = 0;
-                while(i < 120) {
-                    sourceContext.collect(new Lamp(1, i%2 == 0 ? 4 : 6 ,"a", Time.now() + i*1000));
-                    i++;
-                }
-            }
-
-            @Override
-            public void cancel() {
-
-            }
-        });
-*/
-
-
-        DataStream<Lamp> lampStream = env.addSource(new SourceFunction<Lamp>() {
-            @Override
-            public void run(SourceContext<Lamp> sourceContext) throws Exception {
-                int i = 1;
                 long lastSubDate = System.currentTimeMillis();
-                while(i <= 25) {
-                    sourceContext.collect(new Lamp(1, lastSubDate + i*1000, lastSubDate));
-                    sourceContext.collect(new Lamp(2, lastSubDate + i*2100, lastSubDate));
-                    sourceContext.collect(new Lamp(3, lastSubDate + i*4300, lastSubDate));
-                    sourceContext.collect(new Lamp(4, lastSubDate + i*8700, lastSubDate));
-                    sourceContext.collect(new Lamp(5, lastSubDate + i*18000, lastSubDate));
+                while(i < 120) {
+                    sourceContext.collect(new Lamp(1, i%2 == 0 ? 4 : 6 ,"a", lastSubDate, Time.now() + i*1000));
+                    sourceContext.collect(new Lamp(2, i%2 == 0 ? 4 : 6 ,"a", lastSubDate, Time.now() + i*2100));
+                    sourceContext.collect(new Lamp(3, i%2 == 0 ? 4 : 6 ,"a", lastSubDate, Time.now() + i*4300));
+                    sourceContext.collect(new Lamp(4, i%2 == 0 ? 4 : 6 ,"a", lastSubDate, Time.now() + i*8700));
+                    sourceContext.collect(new Lamp(5, i%2 == 0 ? 4 : 6 ,"a", lastSubDate, Time.now() + i*18000));
                     i++;
                 }
             }

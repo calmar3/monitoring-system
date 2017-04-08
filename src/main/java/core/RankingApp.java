@@ -27,9 +27,6 @@ import operator.key.LampKey;
 import operator.merger.RankMerger;
 import operator.ranker.LampRanker;
 import operator.time.LampTSExtractor;
-import operator.window.LampWindowFunction;
-import operator.window.SumFoldFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.datastream.WindowedStream;
@@ -40,8 +37,6 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 import utils.connector.KafkaConfigurator;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeSet;
 
 

@@ -35,12 +35,22 @@ public class Lamp {
         this.address = address;
     }
 
-    public Lamp(long lampId, double consumption,String address, long timestamp){
+    public Lamp(long lampId, double consumption, String address, long timestamp){
         this.lampId = lampId;
         this.consumption = consumption;
         this.address = address;
         this.timestamp = timestamp;
     }
+
+    public Lamp(long lampId, double consumption, String address, long lastSubstitutionDate, long timestamp){
+        this.lampId = lampId;
+        this.consumption = consumption;
+        this.address = address;
+        this.timestamp = timestamp;
+        this.lastSubstitutionDate = lastSubstitutionDate;
+        this.residualLifeTime = timestamp - lastSubstitutionDate;
+    }
+
 
     public long getLampId() {
         return lampId;

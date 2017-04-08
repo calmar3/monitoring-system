@@ -1,4 +1,4 @@
-package operator.window.olgWindowFunction;
+package operator.window.oldWindowFunction;
 
 import model.Lamp;
 import model.Street;

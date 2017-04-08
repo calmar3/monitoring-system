@@ -5,6 +5,7 @@ import model.Lamp;
 import model.Street;
 import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.omg.CORBA.Object;
 
 /**
  * Created by maurizio on 04/04/17.
@@ -22,11 +23,11 @@ public class SumFoldFunction implements FoldFunction<Object, Tuple2<Object, Long
 
             if(obj instanceof Lamp) {
                 Lamp l = (Lamp) obj;
-                return new Tuple2<Object, Long>(new Lamp(l.getLampId(), ((Lamp)in.f0).getConsumption() + l.getConsumption(), l.getAddress(), l.getTimestamp()), in.f1 + 1);
+                return new Tuple2<>((Object)(new Lamp(l.getLampId(), ((Lamp)in.f0).getConsumption() + l.getConsumption(), l.getAddress(), l.getTimestamp())), in.f1 + 1);
             }
             else /*(obj instanceof Street)*/ {
                 Street s = (Street) obj;
-                return new Tuple2<Object, Long>((new Street(s.getId(), ((Street)in.f0).getConsumption() + s.getConsumption(), s.getTimestamp())) , in.f1 + 1);
+                return new Tuple2<>((Object)(new Street(s.getId(), ((Street)in.f0).getConsumption() + s.getConsumption(), s.getTimestamp())) , in.f1 + 1);
             }
         }
         else {

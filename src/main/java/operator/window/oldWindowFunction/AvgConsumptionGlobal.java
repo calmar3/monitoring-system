@@ -1,9 +1,7 @@
-package operator.window.olgWindowFunction;
+package operator.window.oldWindowFunction;
 
-import model.Lamp;
 import model.Street;
 import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.util.Collector;
 
