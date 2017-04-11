@@ -1,4 +1,4 @@
-package operator.window.lampWindow;
+package operator.window.windowfunction;
 
 import model.Lamp;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -22,8 +22,8 @@ public class LampWindowFunction implements WindowFunction<Tuple2<Lamp, Long>, La
     @Override
     public void apply (Long key, TimeWindow timeWindow, Iterable<Tuple2<Lamp, Long>> input, Collector<Lamp> out) throws Exception {
 
-        Tuple2<Lamp, Long> totConsLamp = input.iterator().next();
+        Tuple2<Lamp, Long> avgConsLamp = input.iterator().next();
         //System.out.println("LampWindowFunction result " + (totConsLamp.f0.getConsumption()/totConsLamp.f1) + " Timestamp " + totConsLamp.f0.getTimestamp());
-        out.collect(new Lamp(key, totConsLamp.f0.getConsumption() / totConsLamp.f1, totConsLamp.f0.getAddress(), totConsLamp.f0.getTimestamp()));
+        out.collect(avgConsLamp.f0);
     }
 }

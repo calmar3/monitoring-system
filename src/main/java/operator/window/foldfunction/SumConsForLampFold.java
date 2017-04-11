@@ -1,4 +1,4 @@
-package operator.window.lampWindow;
+package operator.window.foldfunction;
 
 import model.Lamp;
 import org.apache.flink.api.common.functions.FoldFunction;

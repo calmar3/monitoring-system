@@ -1,5 +1,10 @@
 package model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.sling.commons.json.JSONException;
+import org.apache.sling.commons.json.JSONObject;
+
 import java.io.Serializable;
 
 /**
@@ -130,4 +135,22 @@ public class Lamp {
 
         return ride;
     }
+
+
+    public static String toJson(Lamp l) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonInString = new String("");
+        try {
+            jsonInString = mapper.writeValueAsString(l);
+            return jsonInString;
+
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+
+    }
+
+
 }

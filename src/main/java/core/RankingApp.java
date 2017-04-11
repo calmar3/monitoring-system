@@ -55,7 +55,7 @@ public class RankingApp {
 
 
 		// get a kafka consumer
-		FlinkKafkaConsumer010<Lamp> kafkaConsumer = KafkaConfigurator.getConsumer("lampInfo");
+		FlinkKafkaConsumer010<Lamp> kafkaConsumer = KafkaConfigurator.kafkaConsumer("lamp_data");
 
 		// assign a timestamp extractor to the consumer
 		FlinkKafkaConsumerBase<Lamp> kafkaConsumerTS = kafkaConsumer.assignTimestampsAndWatermarks(new LampTSExtractor());
@@ -96,7 +96,7 @@ public class RankingApp {
 		DataStream<TreeSet<Lamp>> updateGlobalRank = globalRank.filter(new UpdateGlobalRankFilter(MAX_RANK_SIZE)).setParallelism(1);
 		
 		// publish result on Kafka topic
-		KafkaConfigurator.getProducerRank(updateGlobalRank);
+		KafkaConfigurator.rankKafkaProducer("rank", updateGlobalRank);
 
 
 

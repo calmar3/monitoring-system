@@ -1,4 +1,4 @@
-package operator.window.cityWindow;
+package operator.window.windowfunction;
 
 import model.Lamp;
 import model.Street;
@@ -15,8 +15,8 @@ public class CityWindowFunction implements AllWindowFunction<Tuple2<Street, Long
     @Override
     public void apply(TimeWindow timeWindow, Iterable<Tuple2<Street, Long>> input, Collector<Tuple2<Double, Long>> out) throws Exception {
 
-        Tuple2<Street, Long> totCons = input.iterator().next();
+        Tuple2<Street, Long> avgCons = input.iterator().next();
 
-        out.collect(new Tuple2<>(totCons.f0.getConsumption()/totCons.f1 , totCons.f0.getTimestamp()));
+        out.collect(new Tuple2<>(avgCons.f0.getConsumption(), avgCons.f0.getTimestamp()));
     }
 }

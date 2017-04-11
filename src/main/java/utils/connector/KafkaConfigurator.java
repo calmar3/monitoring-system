@@ -2,15 +2,22 @@ package utils.connector;
 
 import model.Lamp;
 
+import model.Street;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import utils.serialization.JsonEncoder;
 import utils.serialization.LampRankSchema;
 import utils.serialization.LampSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import utils.serialization.StreetSchema;
 
-import java.util.Objects;
 import java.util.Properties;
 import java.util.TreeSet;
+
+
 
 /**
  * Created by maurizio on 28/03/17.
@@ -23,7 +30,7 @@ public class KafkaConfigurator {
     private static final String LAMP_TOPIC_CONSUMPTION = "lampInfo";
     private static final String LAMP_TOPIC_RANKING= "rank";
 
-    public static final FlinkKafkaConsumer010<Lamp> getConsumer(String topic) {
+    public static final FlinkKafkaConsumer010<Lamp> kafkaConsumer(String topic) {
 
         // configure the Kafka consumer
         Properties kafkaProps = new Properties();
@@ -48,12 +55,12 @@ public class KafkaConfigurator {
     }
 
 
-    public static final void getProducerCons(DataStream<Lamp> lampStream) {
+    public static final void lampKafkaProducer(String topic, DataStream<Lamp> lampStream) {
 
         //write data to a Kafka sink
         lampStream.addSink(new FlinkKafkaProducer010<>(
                 LOCAL_KAFKA_BROKER,
-                LAMP_TOPIC_CONSUMPTION,
+                topic,
                 new LampSchema()
         ));
 
@@ -61,16 +68,46 @@ public class KafkaConfigurator {
         //lampStream.print();
     }
 
-    public static final void getProducerRank(DataStream<TreeSet<Lamp>> lampRank) {
+    public static final void streetKafkaProducer(String topic, DataStream<Street> streetStream) {
+
+        //write data to a Kafka sink
+        streetStream.addSink(new FlinkKafkaProducer010<>(
+                LOCAL_KAFKA_BROKER,
+                topic,
+                new StreetSchema()
+        ));
+
+        //print only for testing
+        //lampStream.print();
+    }
+
+    public static final void rankKafkaProducer(String topic, DataStream<TreeSet<Lamp>> lampRank) {
 
         //write data to a Kafka sink
         lampRank.addSink(new FlinkKafkaProducer010<>(
                 LOCAL_KAFKA_BROKER,
-                LAMP_TOPIC_RANKING,
+                topic,
                 new LampRankSchema()
         )).setParallelism(1);
 
         //print only for testing
-        lampRank.print();
+        //lampRank.print();
+    }
+
+    public static void warningKafkaProducer(String topic, String key, Lamp l) {
+        Properties props = new Properties();
+        props.put("bootstrap.servers", LOCAL_KAFKA_BROKER);
+        props.put("acks", "all");
+        props.put("retries", 0);
+        props.put("batch.size", 16384);
+        props.put("linger.ms", 1);
+        props.put("buffer.memory", 33554432);
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+        Producer<String, String> producer = new KafkaProducer<>(props);
+        producer.send(new ProducerRecord<>(topic, key, JsonEncoder.serialize(l)));
+
+        //producer.close();
     }
 }

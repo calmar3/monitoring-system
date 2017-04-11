@@ -1,4 +1,4 @@
-package operator.window.streetWindow;
+package operator.window.foldfunction;
 
 import model.Lamp;
 import model.Street;
