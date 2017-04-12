@@ -23,7 +23,7 @@ import model.Lamp;
 import operator.filter.FilterByLamp;
 import operator.filter.ThresholdFilter;
 import operator.filter.UpdateGlobalRankFilter;
-import operator.key.LampKey;
+import operator.key.LampIdKey;
 import operator.merger.RankMerger;
 import operator.ranker.LampRanker;
 import operator.time.LampTSExtractor;
@@ -81,7 +81,7 @@ public class RankingApp {
 		filteredByThreshold.print();
 
 		// grouping by lamp id and windowing the streamtime
-		WindowedStream<Lamp, Long , TimeWindow> windowedStream = filteredByThreshold.keyBy(new LampKey()).timeWindow(Time.milliseconds(WINDOW_SIZE));
+		WindowedStream<Lamp, Long , TimeWindow> windowedStream = filteredByThreshold.keyBy(new LampIdKey()).timeWindow(Time.milliseconds(WINDOW_SIZE));
 		
 		// compute partial rank 
 		SingleOutputStreamOperator<TreeSet<Lamp>> partialRank = windowedStream.apply(new LampRanker(MAX_RANK_SIZE));

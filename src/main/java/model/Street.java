@@ -7,6 +7,8 @@ public class Street {
 
     private String id;
     private Double consumption;
+    private double avgConsumption;
+    private double medianConsumption;
     private long timestamp;
 
     public Street() {}
@@ -16,6 +18,19 @@ public class Street {
         this.consumption = consumption;
         this.timestamp = timestamp;
     }
+
+    public Street(String id, double consumption, double avgConsumption, long timestamp) {
+        this.id = id;
+        this.consumption = consumption;
+        this.avgConsumption = avgConsumption;
+        this.timestamp = timestamp;
+    }
+
+    public Street(String id, long timestamp) {
+        this.id = id;
+        this.timestamp = timestamp;
+    }
+
     public String getId() {
         return id;
     }
@@ -32,6 +47,22 @@ public class Street {
         this.consumption = consumption;
     }
 
+    public double getMedianConsumption() {
+        return medianConsumption;
+    }
+
+    public void setMedianConsumption(double medianConsumption) {
+        this.medianConsumption = medianConsumption;
+    }
+
+    public double getAvgConsumption() {
+        return avgConsumption;
+    }
+
+    public void setAvgConsumption(double avgConsumption) {
+        this.avgConsumption = avgConsumption;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
@@ -43,10 +74,12 @@ public class Street {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.id).append(",");
-        this.consumption = Math.round(this.consumption*100.0)/100.0;
-        sb.append(this.consumption).append(",");
-        sb.append(" timestamp : ").append(this.timestamp);
+        sb.append(this.id).append(", ");
+        //this.consumption = Math.round(this.consumption*100.0)/100.0;
+        //sb.append(this.consumption).append(", ");
+        //sb.append(this.avgConsumption).append(", ");
+        //sb.append(this.medianConsumption).append(", ");
+        sb.append("timestamp : ").append(this.timestamp);
         return sb.toString();
     }
 }

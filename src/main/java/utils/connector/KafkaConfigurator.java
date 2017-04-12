@@ -27,9 +27,6 @@ public class KafkaConfigurator {
     private static final String LOCAL_ZOOKEEPER_HOST = "localhost:2181";
     private static final String LOCAL_KAFKA_BROKER = "localhost:9092";
 
-    private static final String LAMP_TOPIC_CONSUMPTION = "lampInfo";
-    private static final String LAMP_TOPIC_RANKING= "rank";
-
     public static final FlinkKafkaConsumer010<Lamp> kafkaConsumer(String topic) {
 
         // configure the Kafka consumer
@@ -108,6 +105,6 @@ public class KafkaConfigurator {
         Producer<String, String> producer = new KafkaProducer<>(props);
         producer.send(new ProducerRecord<>(topic, key, JsonEncoder.serialize(l)));
 
-        //producer.close();
+        producer.close();
     }
 }

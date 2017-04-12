@@ -12,13 +12,15 @@ import java.io.Serializable;
  */
 public class Lamp {
 
-
     private long lampId;
     private double consumption;
+    private double avgConsumption;
+    private double medianConsumption;
     private String address;
     private long timestamp;
     private long lastSubstitutionDate;
     private long residualLifeTime;
+    private String city;
 
     public Lamp() {}
 
@@ -56,6 +58,43 @@ public class Lamp {
         this.residualLifeTime = timestamp - lastSubstitutionDate;
     }
 
+    public Lamp(long lampId, double consumption, String city, String address, long timestamp) {
+        this.lampId = lampId;
+        this.consumption = consumption;
+        this.city = city;
+        this.address = address;
+        this.timestamp = timestamp;
+    }
+
+    public Lamp(String city) {
+        this.city = city;
+    }
+
+    public Lamp(long lampId, double consumption, double avgConsumption, String address, long timestamp) {
+        this.lampId = lampId;
+        this.consumption = consumption;
+        this.avgConsumption = avgConsumption;
+        this.address = address;
+        this.timestamp = timestamp;
+    }
+
+    public Lamp(String city, double consumption) {
+        this.city = city;
+        this.consumption = consumption;
+    }
+
+    public Lamp(int lampId, long timestamp, String address, String city) {
+        this.lampId = lampId;
+        this.timestamp = timestamp;
+        this.address = address;
+        this.city = city;
+    }
+
+    public Lamp(String city, double consumption, long timestamp) {
+        this.city = city;
+        this.consumption = consumption;
+        this.timestamp = timestamp;
+    }
 
     public long getLampId() {
         return lampId;
@@ -71,6 +110,30 @@ public class Lamp {
 
     public void setConsumption(double consumption) {
         this.consumption = consumption;
+    }
+
+    public double getMedianConsumption() {
+        return medianConsumption;
+    }
+
+    public void setMedianConsumption(double medianConsumption) {
+        this.medianConsumption = medianConsumption;
+    }
+
+    public double getAvgConsumption() {
+        return avgConsumption;
+    }
+
+    public void setAvgConsumption(double avgConsumption) {
+        this.avgConsumption = avgConsumption;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getAddress() {
@@ -107,10 +170,12 @@ public class Lamp {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.lampId).append(",");
-        sb.append(this.consumption).append(",");
-        sb.append(this.address);
-        sb.append(" timestamp : ").append(this.timestamp);
+        sb.append(this.lampId).append(", ");
+        sb.append("Cons : ").append(this.consumption).append(", ");
+       // sb.append("avgCons : ").append(this.avgConsumption).append(", ");
+       // sb.append("medianCons : ").append(this.medianConsumption).append(", ");
+        sb.append(this.address).append(", ");
+        sb.append("timestamp : ").append(this.timestamp);
 
         return sb.toString();
     }
@@ -151,6 +216,5 @@ public class Lamp {
         }
 
     }
-
 
 }

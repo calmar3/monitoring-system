@@ -11,8 +11,11 @@ public class AvgConsLampFold implements FoldFunction<Lamp, Tuple2<Lamp, Long>> {
 
     @Override
     public Tuple2<Lamp, Long> fold(Tuple2<Lamp, Long> in, Lamp l) throws Exception {
-        if(in.f0 != null)
-            return new Tuple2<>(new Lamp(l.getLampId(), in.f0.getConsumption() + (l.getConsumption() - in.f0.getConsumption())/(in.f1 + 1), l.getAddress(), l.getTimestamp()), in.f1 + 1);
+
+        if(in.f0 != null) {
+            l.setConsumption(in.f0.getConsumption() + (l.getConsumption() - in.f0.getConsumption()) / (in.f1 + 1));
+            return new Tuple2<>(l, in.f1 + 1);
+        }
         else
             return new Tuple2<>(l, (long)1);
     }

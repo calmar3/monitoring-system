@@ -2,31 +2,31 @@ package core;
 
 import control.EnvConfigurator;
 import model.Street;
+import operator.filter.PercentualFilter;
 import operator.filter.ThresholdFilter;
 import operator.filter.UpdateGlobalRankFilter;
-import operator.key.StreetKey;
+import operator.join.LocalGlobalMedianJoin;
+import operator.key.*;
 import operator.merger.RankMerger;
 import operator.ranker.LampRanker;
 import operator.time.LampTSExtractor;
 import operator.window.foldfunction.*;
-import operator.window.windowfunction.CityWindowFunction;
-import operator.window.windowfunction.LampWindowFunction;
-import operator.window.windowfunction.StreetWindowFunction;
+import operator.window.windowfunction.*;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.streaming.api.datastream.AllWindowedStream;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.streaming.api.datastream.*;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 import utils.connector.KafkaConfigurator;
 import operator.filter.FilterByLamp;
-import operator.key.LampKey;
 import model.Lamp;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 public class MonitoringApp {
@@ -56,7 +56,7 @@ public class MonitoringApp {
 	private static final long THRESHOLD = 1000;
 	private static final long RANK_WINDOW_SIZE = 10; //seconds
 
-	//avg Consumption
+	// avg Consumption
 	private static final long HOUR_CONS_WINDOW_SIZE = 60; //minutes
 	private static final long HOUR_CONS_WINDOW_SLIDE = 10; //minutes
 	private static final long DAY_CONS_WINDOW_SIZE = 24; //hours
@@ -65,6 +65,12 @@ public class MonitoringApp {
 	private static final long WEEK_CONS_WINDOW_SLIDE = 1; //days
 
 
+	// median
+	private static final long MEDIAN_WINDOW_SIZE = 10; //seconds
+	private static final long MEDIAN_WINDOW_SLIDE = 2; //seconds
+
+
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
 
 		// set up the streaming execution environment
@@ -92,6 +98,23 @@ public class MonitoringApp {
 		// filter data
 		DataStream<Lamp> filteredById = lampStream.filter(new FilterByLamp());
 
+		/**
+		 * Data for validate median calculation
+		*/
+
+/*		List<Lamp> data = new ArrayList<>();
+
+		for(long i=1; i<=5; i++){
+			data.add(new Lamp(1, i*1100, "Roma", "via palmiro togliatti", i*10));
+			data.add(new Lamp(2, i*1200, "Roma", "via palmiro togliatti", i*20));
+			data.add(new Lamp(3, i*1300, "Roma", "via palmiro togliatti", i*30));
+			data.add(new Lamp(4, i*1400, "Roma", "via tuscolana", i*40));
+		}
+
+		DataStream<Lamp> lampStream = env.fromCollection(data).assignTimestampsAndWatermarks(new LampTSExtractor());
+
+		lampStream.writeAsText("Data");
+*/
 
 		/**
 		 * INSERT CODE FOR RANKING
@@ -104,10 +127,10 @@ public class MonitoringApp {
 		//filteredByThreshold.writeAsText("debug1");
 
 		// grouping by lamp id and windowing the stream
-		WindowedStream<Lamp, Long , TimeWindow> windowedStream = filteredByThreshold.keyBy(new LampKey()).timeWindow(Time.seconds(RANK_WINDOW_SIZE));
+		WindowedStream<Lamp, Long , TimeWindow> rankWindowedStream = filteredByThreshold.keyBy(new LampIdKey()).timeWindow(Time.seconds(RANK_WINDOW_SIZE));
 
 		// compute partial rank
-		SingleOutputStreamOperator<TreeSet<Lamp>> partialRank = windowedStream.apply(new LampRanker(MAX_RANK_SIZE));
+		SingleOutputStreamOperator<TreeSet<Lamp>> partialRank = rankWindowedStream.apply(new LampRanker(MAX_RANK_SIZE));
 
 		//partialRank.writeAsText("debug2");
 
@@ -127,35 +150,37 @@ public class MonitoringApp {
 		 */
 
 		// average consumption for lamp (hour)
-		WindowedStream lampWindowedStreamHour = filteredById.keyBy(new LampKey()).timeWindow(Time.seconds(100));
+		WindowedStream lampWindowedStreamHour = filteredById.keyBy(new LampIdKey()).timeWindow(Time.seconds(10));
 		SingleOutputStreamOperator avgConsLampStreamHour = lampWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFold(), new LampWindowFunction());
 		avgConsLampStreamHour.print();
+
 /*
 		// average consumption for lamp (day)
-		WindowedStream lampWindowedStreamDay = avgConsLampStreamHour.keyBy(new LampKey()).timeWindow(Time.minutes(3));
+		WindowedStream lampWindowedStreamDay = avgConsLampStreamHour.keyBy(new LampIdKey()).timeWindow(Time.minutes(3));
 		SingleOutputStreamOperator avgConsLampStreamDay = lampWindowedStreamDay.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFold(), new LampWindowFunction());
 		avgConsLampStreamDay.print();
-
-		// average consumption for lamp (week)
-		WindowedStream lampWindowedStreamWeek = avgConsLampStreamDay.keyBy(new LampKey()).timeWindow(Time.minutes(5));
-		DataStream<Lamp> avgConsLampStreamWeek = lampWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFold(), new LampWindowFunction());
-		avgConsLampStreamDay.print();
+*/
+/*		// average consumption for lamp (week)
+		WindowedStream lampWindowedStreamWeek = avgConsLampStreamDay.keyBy(new LampIdKey()).timeWindow(Time.minutes(5));
+		SingleOutputStreamOperator<Tuple2<Lamp, Double>> avgConsLampStreamWeek = lampWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFold(), new LampWindowFunction());
+		avgConsLampStreamWeek.print();
 */
 
 		/**
 		 * AVG CONSUMPTION FOR STREET
 		 */
 		// average consumption by street (hour)
-		WindowedStream streetWindowedStreamHour = avgConsLampStreamHour.keyBy(new StreetKey()).timeWindow(Time.seconds(100));
+		WindowedStream streetWindowedStreamHour = avgConsLampStreamHour.keyBy(new LampAddressKey()).timeWindow(Time.seconds(100));
 		DataStream<Street> avgConsStreetStreamHour = streetWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new AvgConsStreetWarnFold(WARNING_HOUR_TOPIC), new StreetWindowFunction());
 		avgConsStreetStreamHour.print();
+
 /*
 		// average consumption by street (day)
-		WindowedStream streetWindowedStreamDay = avgConsLampStreamDay.keyBy(new StreetKey()).timeWindow(Time.minutes(3));
+		WindowedStream streetWindowedStreamDay = avgConsLampStreamDay.keyBy(new LampAddressKey()).timeWindow(Time.minutes(3));
 		DataStream<Street> avgConsStreetStreamDay = streetWindowedStreamDay.fold(new Tuple2<>(null, (long) 0), new AvgConsStreetWarnFold(WARNING_DAY_TOPIC), new StreetWindowFunction());
 		avgConsStreetStreamDay.print();
 
-		WindowedStream streetWindowedStreamWeek = avgConsLampStreamWeek.keyBy(new StreetKey()).timeWindow(Time.minutes(5));
+		WindowedStream streetWindowedStreamWeek = avgConsLampStreamWeek.keyBy(new LampAddressKey()).timeWindow(Time.minutes(5));
 		DataStream<Street> avgConsStreetStreamWeek = streetWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new AvgConsStreetWarnFold(WARNING_WEEK_TOPIC), new StreetWindowFunction());
 		avgConsStreetStreamWeek.print();
 	*/
@@ -167,6 +192,7 @@ public class MonitoringApp {
 		AllWindowedStream cityWindowedStreamHour = avgConsStreetStreamHour.timeWindowAll(Time.seconds(100));
 		SingleOutputStreamOperator avgConsCityStreamHour = cityWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new AvgConsCityFold(), new CityWindowFunction()).setParallelism(1);
 		avgConsCityStreamHour.print().setParallelism(1);
+
 /*
 		AllWindowedStream cityWindowedStreamDay = avgConsStreetStreamDay.timeWindowAll(Time.minutes(3));
 		SingleOutputStreamOperator avgConsCityStreamDay = cityWindowedStreamDay.fold(new Tuple2<>(null, (long) 0), new AvgConsCityFold(), new CityWindowFunction()).setParallelism(1);
@@ -175,8 +201,32 @@ public class MonitoringApp {
 		AllWindowedStream cityWindowedStreamWeek = avgConsStreetStreamWeek.timeWindowAll(Time.minutes(5));
 		SingleOutputStreamOperator avgConsCityStreamWeek = cityWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new AvgConsCityFold(), new CityWindowFunction()).setParallelism(1);
 		avgConsCityStreamWeek.print().setParallelism(1);
-
 */
+
+		/**
+		 * 50 MEDIAN
+		 */
+
+		WindowedStream LampWindowedStream = filteredById.keyBy(new LampIdKey()).timeWindow(Time.seconds(MEDIAN_WINDOW_SIZE), Time.seconds(MEDIAN_WINDOW_SLIDE));
+		SingleOutputStreamOperator lampMedianStream = LampWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFold(), new LampMedianWindowFunction());
+		lampMedianStream.writeAsText("LampMedian");
+
+
+		AllWindowedStream globalWindowedStream = lampMedianStream.timeWindowAll(Time.seconds(MEDIAN_WINDOW_SIZE),  Time.seconds(MEDIAN_WINDOW_SLIDE));
+		SingleOutputStreamOperator globalMedianStream = globalWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFold(), new GlobalMedianWindowFunction()).setParallelism(1);
+		globalMedianStream.writeAsText("GlobalMedian");
+
+
+		JoinedStreams.WithWindow joinedWindowedStream = lampMedianStream.join(globalMedianStream).where(new LampCityKey()).equalTo(new LampCityKey()).window(TumblingEventTimeWindows.of(Time.seconds(MEDIAN_WINDOW_SLIDE)));
+		DataStream joinedMedianStream = joinedWindowedStream.apply(new LocalGlobalMedianJoin());
+		joinedMedianStream.writeAsText("JoinedStream");
+
+		WindowedStream groupedStreet = joinedMedianStream.keyBy(new LampAddressKey2()).timeWindow(Time.seconds(18));
+		SingleOutputStreamOperator percentualForStreet = groupedStreet.fold(new Tuple3<>(null, (long) 0,(long) 0), new SumMedianFold(), new PercentualWindowFunction());
+		percentualForStreet.writeAsText("PercentualForStreet");
+
+		SingleOutputStreamOperator filteredPercForStreet = percentualForStreet.keyBy(new StreetIdKey()).filter(new PercentualFilter());
+
 
 		/**
 		 * In questa parte finale ci andrebbe la parte di codice presente al momento
