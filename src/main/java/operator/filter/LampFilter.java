@@ -7,7 +7,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 /**
  * Created by marco on 25/03/17.
  */
-public final class FilterByLamp implements FilterFunction<Lamp> {
+public final class LampFilter implements FilterFunction<Lamp> {
 
     private static final long serialVersionUID = 1L;
 

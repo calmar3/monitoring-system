@@ -1,4 +1,4 @@
-package operator.merger;
+package operator.flatmap;
 
 import model.Lamp;
 import model.Ranking;

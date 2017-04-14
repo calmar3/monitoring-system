@@ -3,12 +3,10 @@ package model;
 /**
  * Created by marco on 27/03/17.
  */
-public class Street {
+public class Street implements Cloneable {
 
     private String id;
     private Double consumption;
-    private double avgConsumption;
-    private double medianConsumption;
     private long timestamp;
 
     public Street() {}
@@ -16,13 +14,6 @@ public class Street {
     public Street(String id, Double consumption, long timestamp){
         this.id = id;
         this.consumption = consumption;
-        this.timestamp = timestamp;
-    }
-
-    public Street(String id, double consumption, double avgConsumption, long timestamp) {
-        this.id = id;
-        this.consumption = consumption;
-        this.avgConsumption = avgConsumption;
         this.timestamp = timestamp;
     }
 
@@ -47,22 +38,6 @@ public class Street {
         this.consumption = consumption;
     }
 
-    public double getMedianConsumption() {
-        return medianConsumption;
-    }
-
-    public void setMedianConsumption(double medianConsumption) {
-        this.medianConsumption = medianConsumption;
-    }
-
-    public double getAvgConsumption() {
-        return avgConsumption;
-    }
-
-    public void setAvgConsumption(double avgConsumption) {
-        this.avgConsumption = avgConsumption;
-    }
-
     public long getTimestamp() {
         return timestamp;
     }
@@ -72,13 +47,16 @@ public class Street {
     }
 
     @Override
+    public Street clone() throws CloneNotSupportedException {
+        return (Street) super.clone();
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.id).append(", ");
         //this.consumption = Math.round(this.consumption*100.0)/100.0;
-        //sb.append(this.consumption).append(", ");
-        //sb.append(this.avgConsumption).append(", ");
-        //sb.append(this.medianConsumption).append(", ");
+        sb.append("consumption : ").append(this.consumption).append(", ");
         sb.append("timestamp : ").append(this.timestamp);
         return sb.toString();
     }

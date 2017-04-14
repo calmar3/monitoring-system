@@ -1,4 +1,4 @@
-package operator.ranker;
+package operator.window.windowfunction;
 
 import model.Lamp;
 import model.Ranking;
@@ -8,13 +8,13 @@ import org.apache.flink.util.Collector;
 
 import java.util.TreeSet;
 
-public class LampRanker implements WindowFunction <Lamp,TreeSet<Lamp>, Long, TimeWindow>{
+public class LampRankerWF implements WindowFunction <Lamp,TreeSet<Lamp>, Long, TimeWindow>{
 
 	private static final long serialVersionUID = 1L;
 	
 	private Ranking ranking;
 	
-	public LampRanker(int maxSizeRank){
+	public LampRankerWF(int maxSizeRank){
 		this.ranking = new Ranking(maxSizeRank);
 	}
 	

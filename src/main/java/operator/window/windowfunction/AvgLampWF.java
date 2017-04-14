@@ -17,13 +17,13 @@ import org.apache.flink.util.Collector;
  */
 
 //WindowFunction<input, output, key, window>
-public class LampWindowFunction implements WindowFunction<Tuple2<Lamp, Long>, Lamp, Long, TimeWindow> {
+public class AvgLampWF implements WindowFunction<Tuple2<Lamp, Long>, Lamp, Long, TimeWindow> {
 
     @Override
     public void apply (Long key, TimeWindow timeWindow, Iterable<Tuple2<Lamp, Long>> input, Collector<Lamp> out) throws Exception {
 
         Tuple2<Lamp, Long> avgConsLamp = input.iterator().next();
-        //System.out.println("LampWindowFunction result " + (totConsLamp.f0.getConsumption()/totConsLamp.f1) + " Timestamp " + totConsLamp.f0.getTimestamp());
-        out.collect(avgConsLamp.f0);
+        //System.out.println("AvgLampWF result " + (totConsLamp.f0.getConsumption()/totConsLamp.f1) + " Timestamp " + totConsLamp.f0.getTimestamp());
+        out.collect(avgConsLamp.f0.clone());
     }
 }

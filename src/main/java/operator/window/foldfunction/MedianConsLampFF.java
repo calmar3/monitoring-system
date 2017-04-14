@@ -1,14 +1,14 @@
 package operator.window.foldfunction;
 
 import model.Lamp;
-import model.TDigestMedian;
+import utils.median.TDigestMedian;
 import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Created by maurizio on 12/04/17.
  */
-public class MedianConsLampFold implements FoldFunction<Lamp, Tuple2<TDigestMedian, Lamp>> {
+public class MedianConsLampFF implements FoldFunction<Lamp, Tuple2<TDigestMedian, Lamp>> {
 
     @Override
     public Tuple2<TDigestMedian, Lamp> fold(Tuple2<TDigestMedian, Lamp> accumulator, Lamp l) throws Exception {

@@ -7,7 +7,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 /**
  * Created by maurizio on 11/04/17.
  */
-public class AvgConsCityFold implements FoldFunction<Street, Tuple2<Street, Long>> {
+public class AvgConsCityFF implements FoldFunction<Street, Tuple2<Street, Long>> {
 
     @Override
     public Tuple2<Street, Long> fold(Tuple2<Street, Long> in, Street s) throws Exception {

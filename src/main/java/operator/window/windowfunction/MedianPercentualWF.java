@@ -9,7 +9,7 @@ import org.apache.flink.util.Collector;
 
 
 //WindowFunction<input, output, key, window>
-public class PercentualWindowFunction implements WindowFunction<Tuple3<Street, Long, Long>, Tuple2<Street, Double>, String, TimeWindow> {
+public class MedianPercentualWF implements WindowFunction<Tuple3<Street, Long, Long>, Tuple2<Street, Double>, String, TimeWindow> {
 
 
 	@Override
@@ -19,7 +19,7 @@ public class PercentualWindowFunction implements WindowFunction<Tuple3<Street, L
 		
 		double percentual = (double) totalPercentual.f2/totalPercentual.f1;
 	    
-		out.collect(new Tuple2<>(totalPercentual.f0, percentual));
+		out.collect(new Tuple2<>(totalPercentual.f0.clone(), percentual));
 		
 	}
 }

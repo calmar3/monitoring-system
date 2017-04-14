@@ -7,7 +7,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 /**
  * Created by maurizio on 11/04/17.
  */
-public class AvgConsLampFold implements FoldFunction<Lamp, Tuple2<Lamp, Long>> {
+public class AvgConsLampFF implements FoldFunction<Lamp, Tuple2<Lamp, Long>> {
 
     @Override
     public Tuple2<Lamp, Long> fold(Tuple2<Lamp, Long> in, Lamp l) throws Exception {

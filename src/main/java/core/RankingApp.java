@@ -20,12 +20,12 @@ package core;
 
 import control.EnvConfigurator;
 import model.Lamp;
-import operator.filter.FilterByLamp;
+import operator.filter.LampFilter;
 import operator.filter.ThresholdFilter;
 import operator.filter.UpdateGlobalRankFilter;
 import operator.key.LampIdKey;
-import operator.merger.RankMerger;
-import operator.ranker.LampRanker;
+import operator.flatmap.RankMerger;
+import operator.window.windowfunction.LampRankerWF;
 import operator.time.LampTSExtractor;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -64,7 +64,7 @@ public class RankingApp {
 		DataStream<Lamp> lampStream = env.addSource(kafkaConsumerTS);
 
 		// filter data
-		DataStream<Lamp> filteredById = lampStream.filter(new FilterByLamp());
+		DataStream<Lamp> filteredById = lampStream.filter(new LampFilter());
 
 
 
@@ -84,7 +84,7 @@ public class RankingApp {
 		WindowedStream<Lamp, Long , TimeWindow> windowedStream = filteredByThreshold.keyBy(new LampIdKey()).timeWindow(Time.milliseconds(WINDOW_SIZE));
 		
 		// compute partial rank 
-		SingleOutputStreamOperator<TreeSet<Lamp>> partialRank = windowedStream.apply(new LampRanker(MAX_RANK_SIZE));
+		SingleOutputStreamOperator<TreeSet<Lamp>> partialRank = windowedStream.apply(new LampRankerWF(MAX_RANK_SIZE));
 		
 		//partialRank.writeAsText("debug2");
 		partialRank.print().setParallelism(1);

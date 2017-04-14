@@ -6,49 +6,28 @@ import org.apache.sling.commons.json.JSONException;
 import org.apache.sling.commons.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by maurizio on 21/03/17.
  */
-public class Lamp {
+public class Lamp implements Cloneable{
 
     private long lampId;
     private double consumption;
-    private double avgConsumption;
-    private double medianConsumption;
     private String address;
+    private String city;
+    private String longitude;
+    private String latitude;
     private long timestamp;
     private long lastSubstitutionDate;
     private long residualLifeTime;
-    private String city;
+    private boolean stateOn;
+    private double lightIntensity;
+    private List<Long> cellId;
 
     public Lamp() {}
-
-    public Lamp(long lampId, double consumption){
-        this.lampId = lampId;
-        this.consumption = consumption;
-    }
-
-    public Lamp(long lampId, long timestamp, long lastSubstitutionDate) {
-        this.lampId = lampId;
-        this.timestamp = timestamp;
-        this.lastSubstitutionDate = lastSubstitutionDate;
-        this.residualLifeTime = timestamp - lastSubstitutionDate;
-    }
-
-    public Lamp(long lampId, double consumption,String address){
-        this.lampId = lampId;
-        this.consumption = consumption;
-        this.address = address;
-    }
-
-    public Lamp(long lampId, double consumption, String address, long timestamp){
-        this.lampId = lampId;
-        this.consumption = consumption;
-        this.address = address;
-        this.timestamp = timestamp;
-    }
-
+    
     public Lamp(long lampId, double consumption, String address, long lastSubstitutionDate, long timestamp){
         this.lampId = lampId;
         this.consumption = consumption;
@@ -66,34 +45,20 @@ public class Lamp {
         this.timestamp = timestamp;
     }
 
-    public Lamp(String city) {
-        this.city = city;
-    }
-
-    public Lamp(long lampId, double consumption, double avgConsumption, String address, long timestamp) {
-        this.lampId = lampId;
-        this.consumption = consumption;
-        this.avgConsumption = avgConsumption;
-        this.address = address;
-        this.timestamp = timestamp;
-    }
-
-    public Lamp(String city, double consumption) {
-        this.city = city;
-        this.consumption = consumption;
-    }
-
-    public Lamp(int lampId, long timestamp, String address, String city) {
-        this.lampId = lampId;
-        this.timestamp = timestamp;
-        this.address = address;
-        this.city = city;
-    }
-
     public Lamp(String city, double consumption, long timestamp) {
         this.city = city;
         this.consumption = consumption;
         this.timestamp = timestamp;
+    }
+
+    public Lamp(long lampId, double consumption, String city, String address, long lastSubstitutionDate, long timestamp){
+        this.lampId = lampId;
+        this.consumption = consumption;
+        this.city = city;
+        this.address = address;
+        this.timestamp = timestamp;
+        this.lastSubstitutionDate = lastSubstitutionDate;
+        this.residualLifeTime = timestamp - lastSubstitutionDate;
     }
 
     public long getLampId() {
@@ -110,22 +75,6 @@ public class Lamp {
 
     public void setConsumption(double consumption) {
         this.consumption = consumption;
-    }
-
-    public double getMedianConsumption() {
-        return medianConsumption;
-    }
-
-    public void setMedianConsumption(double medianConsumption) {
-        this.medianConsumption = medianConsumption;
-    }
-
-    public double getAvgConsumption() {
-        return avgConsumption;
-    }
-
-    public void setAvgConsumption(double avgConsumption) {
-        this.avgConsumption = avgConsumption;
     }
 
     public String getCity() {
@@ -168,19 +117,29 @@ public class Lamp {
         this.residualLifeTime = residualLifeTime;
     }
 
+    public boolean isStateOn() {
+        return stateOn;
+    }
+
+    public void setStateOn(boolean stateOn) {
+        this.stateOn = stateOn;
+    }
+
+    @Override
+    public Lamp clone() throws CloneNotSupportedException {
+        return (Lamp) super.clone();
+    }
+    
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.lampId).append(", ");
         sb.append("Cons : ").append(this.consumption).append(", ");
-       // sb.append("avgCons : ").append(this.avgConsumption).append(", ");
-       // sb.append("medianCons : ").append(this.medianConsumption).append(", ");
         sb.append(this.address).append(", ");
         sb.append("timestamp : ").append(this.timestamp);
 
         return sb.toString();
     }
-
-
+    
     public static Lamp fromString(String line) {
 
         String[] tokens = line.split(",");
@@ -192,7 +151,7 @@ public class Lamp {
 
         try {
             ride.lampId = Long.parseLong(tokens[0]);
-            ride.consumption = Double.parseDouble(tokens[1]);
+            ride.consumption = Long.parseLong(tokens[1]);
 
         } catch (NumberFormatException nfe) {
             throw new RuntimeException("Invalid record: " + line, nfe);
@@ -200,8 +159,7 @@ public class Lamp {
 
         return ride;
     }
-
-
+    
     public static String toJson(Lamp l) {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -216,5 +174,14 @@ public class Lamp {
         }
 
     }
-
+/*
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Lamp origin = new Lamp(1, 10 ,"a", System.currentTimeMillis(), System.currentTimeMillis() + 1000 );
+        Lamp clone = origin.clone();
+        clone.setConsumption(100000);
+        clone.setAddress("Change");
+        System.out.println(Lamp.toJson(origin));
+        System.out.println(Lamp.toJson(clone));
+    }
+*/
 }

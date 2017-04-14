@@ -7,7 +7,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 
 
-public class SumMedianFold implements FoldFunction<Tuple2<Lamp, Boolean>, Tuple3<Street, Long, Long>> {
+public class MedianCountForPercentualFF implements FoldFunction<Tuple2<Lamp, Boolean>, Tuple3<Street, Long, Long>> {
 
 
 	@Override

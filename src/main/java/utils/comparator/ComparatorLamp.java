@@ -1,4 +1,6 @@
-package model;
+package utils.comparator;
+
+import model.Lamp;
 
 import java.io.Serializable;
 import java.util.Comparator;

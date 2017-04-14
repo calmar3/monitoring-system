@@ -3,6 +3,7 @@ package utils.connector;
 import model.Lamp;
 
 import model.Street;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -78,6 +79,7 @@ public class KafkaConfigurator {
         //lampStream.print();
     }
 
+
     public static final void rankKafkaProducer(String topic, DataStream<TreeSet<Lamp>> lampRank) {
 
         //write data to a Kafka sink
@@ -91,7 +93,7 @@ public class KafkaConfigurator {
         //lampRank.print();
     }
 
-    public static void warningKafkaProducer(String topic, String key, Lamp l) {
+    public static final void warningKafkaProducer(String topic, String key, Lamp l) {
         Properties props = new Properties();
         props.put("bootstrap.servers", LOCAL_KAFKA_BROKER);
         props.put("acks", "all");
