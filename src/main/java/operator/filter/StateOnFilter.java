@@ -10,7 +10,7 @@ public class StateOnFilter implements FilterFunction<Lamp> {
     @Override
     public boolean filter(Lamp lamp) throws Exception{
 
-        if(!lamp.isStateOn()&&lamp.getConsumption()>0)
+        if(!lamp.isStateOn() && lamp.getConsumption()>0)
             return true;
         else
             return false;

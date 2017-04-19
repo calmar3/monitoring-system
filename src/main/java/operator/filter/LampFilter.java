@@ -17,9 +17,9 @@ public final class LampFilter implements FilterFunction<Lamp> {
         /**
          * discard invalid tuple
          */
-        if (lamp == null)
+        if (lamp == null) {
             return false;
-
+        }
         /**
          * discard tuple not in avl
          */
@@ -29,8 +29,10 @@ public final class LampFilter implements FilterFunction<Lamp> {
             //lamp.toString();
             return true;
         }*/
-
-        return true;
+        else {
+            //System.out.println("\n\n\n\n\n\n\n\n\n" + lamp.toString() + "\n\n\n\n\n\n\n\n");
+            return true;
+        }
 
     }
 }

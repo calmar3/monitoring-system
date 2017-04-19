@@ -35,6 +35,9 @@ public class LampTSExtractor extends BoundedOutOfOrdernessTimestampExtractor<Lam
     @Override
     public long extractTimestamp(Lamp lamp) {
         //System.out.println(lamp.getTimestamp());
-        return lamp.getTimestamp();
+        if(lamp != null)
+            return lamp.getTimestamp();
+        else
+            return 0;
     }
 }

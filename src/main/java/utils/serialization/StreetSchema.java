@@ -38,25 +38,7 @@ public class StreetSchema implements DeserializationSchema<Street>, Serializatio
 
     @Override
     public Street deserialize(byte[] message) {
-
-        String jsonInString = new String(message);
-        this.mapper = new ObjectMapper();
-        //Street lamp = new Street();
-        try {
-
-            Street lamp = this.mapper.readValue(jsonInString, Street.class);
-            return lamp;
-
-        }  catch (IOException e) {
-
-            /**
-             * .readValue catch exception over any kind of data (double, int, objects ecc ecc)
-             * return null value to discard invalid tuple
-             */
-            return null;
-
-        }
-
+        return null;
     }
 
     @Override

@@ -8,12 +8,9 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import utils.serialization.JsonEncoder;
-import utils.serialization.LampRankSchema;
-import utils.serialization.LampSchema;
+import utils.serialization.*;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import utils.serialization.StreetSchema;
 
 import java.util.Properties;
 import java.util.TreeSet;
@@ -45,10 +42,6 @@ public class KafkaConfigurator {
                 new LampSchema(),   //deserialization schema
                 kafkaProps);        //consumer configuration
 
-
-        // assign a timestamp extractor to the consumer
-        //consumer.assignTimestampsAndWatermarks(new LampTSExtractor());
-
         return consumer;
     }
 
@@ -62,8 +55,7 @@ public class KafkaConfigurator {
                 new LampSchema()
         ));
 
-        //print only for testing
-        //lampStream.print();
+
     }
 
     public static final void streetKafkaProducer(String topic, DataStream<Street> streetStream) {
@@ -74,11 +66,17 @@ public class KafkaConfigurator {
                 topic,
                 new StreetSchema()
         ));
-
-        //print only for testing
-        //lampStream.print();
     }
 
+    public static final void cityKafkaProducer(String topic, DataStream<Double> streetStream) {
+
+        //write data to a Kafka sink
+        streetStream.addSink(new FlinkKafkaProducer010<>(
+                LOCAL_KAFKA_BROKER,
+                topic,
+                new CitySchema()
+        ));
+    }
 
     public static final void rankKafkaProducer(String topic, DataStream<TreeSet<Lamp>> lampRank) {
 
@@ -88,9 +86,16 @@ public class KafkaConfigurator {
                 topic,
                 new LampRankSchema()
         )).setParallelism(1);
+    }
 
-        //print only for testing
-        //lampRank.print();
+    public static final void medianKafkaProducer(String topic, DataStream<Tuple2<String, Double>> lampStream) {
+
+        //write data to a Kafka sink
+        lampStream.addSink(new FlinkKafkaProducer010<>(
+                LOCAL_KAFKA_BROKER,
+                topic,
+                new MedianSchema()
+        ));
     }
 
     public static final void warningKafkaProducer(String topic, String key, Lamp l) {

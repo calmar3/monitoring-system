@@ -1,6 +1,9 @@
 package control;
 
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -25,8 +28,29 @@ public class RuntimeMemoryInfo implements Serializable
         return Runtime.getRuntime().maxMemory();
     }
 
-    public long usedMememory() {
-        return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+    public static void writeUsedMemory(int i) {
+        //System.gc();
+        String performanceString = String.format("usedMemory: %d", Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+        String path = "/Users/maurizio/Desktop/MemoryWithGC" + i + ".txt";
+        File file = new File(path);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException exc) {
+                exc.printStackTrace();
+            }
+        }
+
+        FileWriter writer;
+        try {
+            writer = new FileWriter(file, true);
+            writer.write("\n" + performanceString);
+            writer.close();
+        } catch (IOException exc) {
+            exc.printStackTrace();
+        }
     }
+
+
 
 }

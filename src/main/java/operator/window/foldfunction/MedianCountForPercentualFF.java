@@ -1,5 +1,6 @@
 package operator.window.foldfunction;
 
+import control.RuntimeMemoryInfo;
 import model.Lamp;
 import model.Street;
 import org.apache.flink.api.common.functions.FoldFunction;
@@ -12,6 +13,8 @@ public class MedianCountForPercentualFF implements FoldFunction<Tuple2<Lamp, Boo
 
 	@Override
 	public Tuple3<Street, Long, Long> fold(Tuple3<Street, Long, Long> accumulator, Tuple2<Lamp, Boolean> value) throws Exception {
+
+		//RuntimeMemoryInfo.writeUsedMemory(1002);
 
 		if(accumulator.f0 != null)
 			return new Tuple3<>(new Street(value.f0.getAddress(), value.f0.getTimestamp()), accumulator.f1+1, value.f1 == true ? (accumulator.f2 + 1) : accumulator.f2 );

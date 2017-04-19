@@ -12,7 +12,6 @@ import org.apache.flink.util.Collector;
 //WindowFunction<input, output, key, window>
 public class MedianLampWF implements WindowFunction<Tuple2<TDigestMedian, Lamp>, Lamp, Long, TimeWindow> {
 
-	private static final long serialVersionUID = 1L;
 
 	@Override
     public void apply(Long key, TimeWindow window, Iterable<Tuple2<TDigestMedian, Lamp>> input, Collector<Lamp> out) throws Exception {
@@ -21,7 +20,7 @@ public class MedianLampWF implements WindowFunction<Tuple2<TDigestMedian, Lamp>,
     	Lamp clone = medianLamp.f1.clone();
     	clone.setConsumption(medianLamp.f0.getMedian());
     	out.collect(clone);
-        //out.collect(new Lamp(medianLamp.f1.getLampId(), medianLamp.f0.getMedian(), medianLamp.f1.getCity(), medianLamp.f1.getAddress(), medianLamp.f1.getTimestamp()));
+		//ut.collect(new Lamp(medianLamp.f1.getLampId(), medianLamp.f0.getMedian(), medianLamp.f1.getCity(), medianLamp.f1.getAddress(), medianLamp.f1.getTimestamp()));
     }   
 
 }

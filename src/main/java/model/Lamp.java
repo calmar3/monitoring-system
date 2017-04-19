@@ -2,10 +2,8 @@ package model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.sling.commons.json.JSONException;
-import org.apache.sling.commons.json.JSONObject;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +22,8 @@ public class Lamp implements Cloneable{
     private long residualLifeTime;
     private boolean stateOn;
     private double lightIntensity;
-    private List<Long> cellId;
+    private String model;
+    private ArrayList<Long> cellId;
 
     public Lamp() {}
     
@@ -85,6 +84,46 @@ public class Lamp implements Cloneable{
         this.city = city;
     }
 
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLightIntensity() {
+        return lightIntensity;
+    }
+
+    public void setLightIntensity(double lightIntensity) {
+        this.lightIntensity = lightIntensity;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public List<Long> getCellId() {
+        return cellId;
+    }
+
+    public void setCellId(ArrayList<Long> cellId) {
+        this.cellId = cellId;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -136,6 +175,7 @@ public class Lamp implements Cloneable{
         sb.append("Cons : ").append(this.consumption).append(", ");
         sb.append(this.address).append(", ");
         sb.append("timestamp : ").append(this.timestamp);
+        sb.append("city ").append(this.getCity());
 
         return sb.toString();
     }

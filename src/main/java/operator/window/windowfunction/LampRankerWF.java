@@ -20,17 +20,17 @@ public class LampRankerWF implements WindowFunction <Lamp,TreeSet<Lamp>, Long, T
 	
 	@Override
 	public void apply(Long key, TimeWindow window, Iterable<Lamp> lampStream, Collector<TreeSet<Lamp>> partialRank) throws Exception {
-		
+
 		for(Lamp lamp : lampStream){
 			Lamp oldLamp = this.ranking.findLamp(lamp);
-			
+
 			if(oldLamp != null){
 				this.ranking.getLampRank().remove(oldLamp);
 			}
 			this.ranking.getLampRank().add(lamp);
 			if(this.ranking.overMaxSize())
 				this.ranking.getLampRank().pollLast();
-			
+
 			partialRank.collect(this.ranking.getLampRank());
 		}
 	}

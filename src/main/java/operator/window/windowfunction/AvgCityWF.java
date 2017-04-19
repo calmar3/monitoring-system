@@ -10,13 +10,13 @@ import org.apache.flink.util.Collector;
 /**
  * Created by maurizio on 06/04/17.
  */
-public class AvgCityWF implements AllWindowFunction<Tuple2<Street, Long>, Tuple2<Double, Long>, TimeWindow> {
+public class AvgCityWF implements AllWindowFunction<Tuple2<Street, Long>, Double, TimeWindow> {
 
     @Override
-    public void apply(TimeWindow timeWindow, Iterable<Tuple2<Street, Long>> input, Collector<Tuple2<Double, Long>> out) throws Exception {
+    public void apply(TimeWindow timeWindow, Iterable<Tuple2<Street, Long>> input, Collector<Double> out) throws Exception {
 
         Tuple2<Street, Long> avgCons = input.iterator().next();
 
-        out.collect(new Tuple2<>(avgCons.f0.getConsumption(), avgCons.f0.getTimestamp()));
+        out.collect(new Double(avgCons.f0.getConsumption()));
     }
 }

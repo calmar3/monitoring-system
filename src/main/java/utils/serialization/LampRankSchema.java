@@ -44,13 +44,11 @@ public class LampRankSchema implements DeserializationSchema<TreeSet<Lamp>>, Ser
 
 	@Override
 	public TypeInformation<TreeSet<Lamp>> getProducedType() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public TreeSet<Lamp> deserialize(byte[] message) throws IOException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
