@@ -9,10 +9,9 @@ import java.util.Properties;
  */
 public class AppConfigurator {
 
-    public static final String FILENAME = "/Users/maurizio/Desktop/configuration.txt";
+    public static final String FILENAME = "/Users/maurizio/Desktop/config.properties";
 
     public static String LAMP_DATA_TOPIC = "lamp_data";
-
     public static String RANK_TOPIC = "rank";
 
     public static String WARNING_HOUR_TOPIC = "warning_hour";
@@ -37,40 +36,55 @@ public class AppConfigurator {
 
     // ranking
     public static int MAX_RANK_SIZE = 3;
-    public static long THRESHOLD = 1000; //millisecond
+    public static long THRESHOLD = 1000; //milliseconds
     public static long RANK_WINDOW_SIZE = 10; //seconds
 
-    // avg Consumption
+    // avg
     public static long HOUR_CONS_WINDOW_SIZE = 10; //seconds
     public static long HOUR_CONS_WINDOW_SLIDE = 5; //seconds
-    public static long DAY_CONS_WINDOW_SIZE = 72; //minutes
-    public static long DAY_CONS_WINDOW_SLIDE = 12; //minuti
-    public static long WEEK_CONS_WINDOW_SIZE = 504; //minuti
-    public static long WEEK_CONS_WINDOW_SLIDE = 83; //minuti
+    public static long DAY_CONS_WINDOW_SIZE = 4320; //seconds
+    public static long DAY_CONS_WINDOW_SLIDE = 720; //seconds
+    public static long WEEK_CONS_WINDOW_SIZE = 30240; //seconds
+    public static long WEEK_CONS_WINDOW_SLIDE = 4980; //seconds
 
     // median
-    public static long MEDIAN_WINDOW_SIZE = 10; //secondi
-    public static long MEDIAN_WINDOW_SLIDE = 5; //secondi
+    public static long MEDIAN_WINDOW_SIZE = 10; //seconds
+    public static long MEDIAN_WINDOW_SLIDE = 5; //seconds
+
+
+    /*
+	// ranking
+	private static final int MAX_RANK_SIZE = 3;
+	private static final long THRESHOLD = 1000;
+	private static final long RANK_WINDOW_SIZE = 10; //seconds
+
+	// avg Consumption
+	private static final long HOUR_CONS_WINDOW_SIZE = 3600; //seconds 1 hour
+	private static final long HOUR_CONS_WINDOW_SLIDE = 600; //seconds 10 minutes
+	private static final long DAY_CONS_WINDOW_SIZE = 1440; //minutes 24 hours
+	private static final long DAY_CONS_WINDOW_SLIDE = 240; //minutes 4 hours
+	private static final long WEEK_CONS_WINDOW_SIZE = 10080; //minutes 7 days
+	private static final long WEEK_CONS_WINDOW_SLIDE = 1440; //minutes 1 day
+
+	// median
+	private static final long MEDIAN_WINDOW_SIZE = 3600; //seconds 1 hour
+	private static final long MEDIAN_WINDOW_SLIDE = 600; //seconds 10 minutes
+*/
 
 
 
-    public static void readConfiguration() {
+    public void readConfiguration() {
 
-        String result = "";
-        
         try {
             Properties prop = new Properties();
-            String propFileName = "/Users/maurizio/Desktop/config.properties";
 
-            InputStream inputStream = new FileInputStream(propFileName);
+            InputStream inputStream = new FileInputStream(FILENAME);
 
             if(inputStream != null) {
                 prop.load(inputStream);
             } else {
-                throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+                throw new FileNotFoundException("property file '" + FILENAME + "' not found in the classpath");
             }
-
-            Date time = new Date(System.currentTimeMillis());
 
             // set topic
             LAMP_DATA_TOPIC = prop.getProperty("LAMP_DATA_TOPIC");
@@ -90,9 +104,51 @@ public class AppConfigurator {
             WEEK_CITY_CONS = prop.getProperty("WEEK_CITY_CONS");
             MEDIAN_TOPIC = prop.getProperty("MEDIAN_TOPIC");
 
+            // set param for rank
+            MAX_RANK_SIZE = Integer.parseInt(prop.getProperty("MAX_RANK_SIZE"));
+            THRESHOLD = Long.parseLong(prop.getProperty("THRESHOLD"));
+            RANK_WINDOW_SIZE = Long.parseLong(prop.getProperty("RANK_WINDOW_SIZE"));
 
-            //result = "Company List = " + company1 + ", " + company2 + ", " + company3;
-            //System.out.println(result + "\nProgram Ran on " + time + " by user=" + user);
+            // set param for avg
+            HOUR_CONS_WINDOW_SIZE = Long.parseLong(prop.getProperty("HOUR_CONS_WINDOW_SIZE"));
+            HOUR_CONS_WINDOW_SLIDE = Long.parseLong(prop.getProperty("HOUR_CONS_WINDOW_SLIDE"));
+            DAY_CONS_WINDOW_SIZE = Long.parseLong(prop.getProperty("DAY_CONS_WINDOW_SIZE"));
+            DAY_CONS_WINDOW_SLIDE = Long.parseLong(prop.getProperty("DAY_CONS_WINDOW_SLIDE"));
+            WEEK_CONS_WINDOW_SIZE = Long.parseLong(prop.getProperty("WEEK_CONS_WINDOW_SIZE"));
+            WEEK_CONS_WINDOW_SLIDE = Long.parseLong(prop.getProperty("WEEK_CONS_WINDOW_SLIDE"));
+
+            // set param for median
+            MEDIAN_WINDOW_SIZE = Long.parseLong(prop.getProperty("MEDIAN_WINDOW_SIZE"));
+            MEDIAN_WINDOW_SLIDE = Long.parseLong(prop.getProperty("MEDIAN_WINDOW_SLIDE"));
+
+            /*System.out.println(LAMP_DATA_TOPIC + "\n"
+                                + RANK_TOPIC + "\n"
+                                + WARNING_HOUR_TOPIC + "\n"
+                                + WARNING_DAY_TOPIC + "\n"
+                                + WARNING_WEEK_TOPIC + "\n"
+                                + WARNING_STATE + "\n"
+                                + HOUR_LAMP_CONS + "\n"
+                                + DAY_LAMP_CONS + "\n"
+                                + WEEK_LAMP_CONS + "\n"
+                                + HOUR_STREET_CONS + "\n"
+                                + DAY_STREET_CONS + "\n"
+                                + WEEK_STREET_CONS + "\n"
+                                + HOUR_CITY_CONS + "\n"
+                                + DAY_CITY_CONS + "\n"
+                                + WEEK_CITY_CONS + "\n"
+                                + MEDIAN_TOPIC + "\n"
+                                + MAX_RANK_SIZE + "\n"
+                                + THRESHOLD + "\n"
+                                + RANK_WINDOW_SIZE + "\n"
+                                + HOUR_CONS_WINDOW_SIZE + "\n"
+                                + HOUR_CONS_WINDOW_SLIDE + "\n"
+                                + DAY_CONS_WINDOW_SIZE + "\n"
+                                + DAY_CONS_WINDOW_SLIDE + "\n"
+                                + WEEK_CONS_WINDOW_SIZE + "\n"
+                                + WEEK_CONS_WINDOW_SLIDE + "\n"
+                                + MEDIAN_WINDOW_SIZE + "\n"
+                                + MEDIAN_WINDOW_SLIDE + "\n");*/
+
         } 
         catch (Exception e) {
             e.printStackTrace();
