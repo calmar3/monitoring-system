@@ -16,7 +16,7 @@ public class PerformanceWriter {
 
     public static void write(final JobExecutionResult res, final String path) {
         double elapsed = res.getNetRuntime(TimeUnit.NANOSECONDS);
-        long tuples = 40;//res.getAccumulatorResult("tuples");
+        long tuples = 4000;//res.getAccumulatorResult("tuples");
         double latency = elapsed / tuples;
 
         PerformanceWriter.write(path, tuples, elapsed, latency);

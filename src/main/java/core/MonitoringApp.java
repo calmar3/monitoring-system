@@ -2,6 +2,7 @@ package core;
 
 import control.AppConfigurator;
 import control.EnvConfigurator;
+import control.PerformanceWriter;
 import model.Lamp;
 import operator.filter.*;
 import operator.flatmap.RankMerger;
@@ -13,15 +14,13 @@ import operator.key.LampIdKey;
 import operator.time.LampTSExtractor;
 import operator.window.foldfunction.*;
 import operator.window.windowfunction.*;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
-import utils.connector.KafkaConfigurator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +67,7 @@ public class MonitoringApp {
 		List<Lamp> data = new ArrayList<>();
 
 		long lastSubDate = System.currentTimeMillis();
-		for(long i=1; i<=1000; i++){
+		for(long i = 1; i <= 1000; i++){
 			data.add(new Lamp(1, i%2 == 0 ? 3 : 3 , "Roma", "via palmiro togliatti", lastSubDate, org.apache.hadoop.util.Time.now() + i*10000 + 1000));
 			data.add(new Lamp(2, i%2 == 0 ? 3 : 3 , "Roma", "via palmiro togliatti", lastSubDate, org.apache.hadoop.util.Time.now() + i*10000 + 2000));
 			data.add(new Lamp(3, i%2 == 0 ? 7 : 7 , "Roma", "via tuscolana", lastSubDate, org.apache.hadoop.util.Time.now() + i*10000 + 3000));
@@ -87,7 +86,6 @@ public class MonitoringApp {
 		 */
 		//DataStream<Lamp> warningState = filteredById.filter(new StateOnFilter());
 		//KafkaConfigurator.lampKafkaProducer(conf.WARNING_STATE, warningState);
-
 
 		/**
 		 * INSERT CODE FOR RANKING
@@ -119,7 +117,6 @@ public class MonitoringApp {
 		/**
 		 * AVG CONSUMPTION FOR LAMP
 		 */
-
 		// average consumption for lamp (hour)
 		WindowedStream lampWindowedStreamHour = filteredById.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.HOUR_CONS_WINDOW_SIZE), Time.seconds(conf.HOUR_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsLampStreamHour = lampWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFF(), new AvgLampWF());
@@ -209,9 +206,9 @@ public class MonitoringApp {
 		//KafkaConfigurator.medianKafkaProducer(conf.MEDIAN_TOPIC, filteredPercForStreet);
 
 
-		env.execute("Monitoring System");
+		//env.execute("Monitoring System");
 
-		//JobExecutionResult res = env.execute("Monitoring");
-		//PerformanceWriter.write(res, "/Users/maurizio/Desktop/test.txt");
+		JobExecutionResult res = env.execute("Monitoring");
+		PerformanceWriter.write(res, "/Users/maurizio/Desktop/test.txt");
 	}
 }

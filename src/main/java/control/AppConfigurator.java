@@ -1,7 +1,6 @@
 package control;
 
 import java.io.*;
-import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -78,13 +77,9 @@ public class AppConfigurator {
         try {
             Properties prop = new Properties();
 
-            InputStream inputStream = new FileInputStream(FILENAME);
+            FileInputStream inputStream = new FileInputStream(FILENAME);
 
-            if(inputStream != null) {
-                prop.load(inputStream);
-            } else {
-                throw new FileNotFoundException("property file '" + FILENAME + "' not found in the classpath");
-            }
+            prop.load(inputStream);
 
             // set topic
             LAMP_DATA_TOPIC = prop.getProperty("LAMP_DATA_TOPIC");
@@ -153,6 +148,5 @@ public class AppConfigurator {
         catch (Exception e) {
             e.printStackTrace();
         }
-    
     }
 }

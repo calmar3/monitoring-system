@@ -20,7 +20,7 @@ public class WriteToKafkaApp {
 
         /**
          *
-         * DATA FOR TEST AVG, WARNING,
+         * DATA FOR TEST AVG
          */
 		DataStream<Lamp> lampStream = env.addSource(new SourceFunction<Lamp>() {
             @Override
