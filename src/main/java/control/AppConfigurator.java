@@ -10,6 +10,8 @@ public class AppConfigurator {
 
     public static final String FILENAME = "/Users/maurizio/Desktop/config.properties";
 
+    public static int ADD_TUPLE_FOR_TEST = 99;  //9k
+
     public static String LAMP_DATA_TOPIC = "lamp_data";
     public static String RANK_TOPIC = "rank";
 
@@ -39,12 +41,12 @@ public class AppConfigurator {
     public static long RANK_WINDOW_SIZE = 10; //seconds
 
     // avg
-    public static long HOUR_CONS_WINDOW_SIZE = 10; //seconds
-    public static long HOUR_CONS_WINDOW_SLIDE = 5; //seconds
-    public static long DAY_CONS_WINDOW_SIZE = 4320; //seconds
-    public static long DAY_CONS_WINDOW_SLIDE = 720; //seconds
-    public static long WEEK_CONS_WINDOW_SIZE = 30240; //seconds
-    public static long WEEK_CONS_WINDOW_SLIDE = 4980; //seconds
+    public static long HOUR_CONS_WINDOW_SIZE = 3600; //seconds 1 ora
+    public static long HOUR_CONS_WINDOW_SLIDE = 600; //seconds 10 minuti
+    public static long DAY_CONS_WINDOW_SIZE = 86400; //seconds 1 giorno
+    public static long DAY_CONS_WINDOW_SLIDE = 14400; //seconds 4 ore
+    public static long WEEK_CONS_WINDOW_SIZE = 604800; //seconds 7 giorni
+    public static long WEEK_CONS_WINDOW_SLIDE = 86400; //seconds 1 giorno
 
     // median
     public static long MEDIAN_WINDOW_SIZE = 10; //seconds
@@ -80,6 +82,9 @@ public class AppConfigurator {
             FileInputStream inputStream = new FileInputStream(FILENAME);
 
             prop.load(inputStream);
+
+            //set tuple for test
+            ADD_TUPLE_FOR_TEST =  Integer.parseInt(prop.getProperty("ADD_TUPLE_FOR_TEST"));
 
             // set topic
             LAMP_DATA_TOPIC = prop.getProperty("LAMP_DATA_TOPIC");

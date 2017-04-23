@@ -23,7 +23,6 @@ public class Lamp implements Cloneable{
     private boolean stateOn;
     private double lightIntensity;
     private String model;
-    private ArrayList<Long> cellId;
 
     public Lamp() {}
     
@@ -114,14 +113,6 @@ public class Lamp implements Cloneable{
 
     public void setModel(String model) {
         this.model = model;
-    }
-
-    public List<Long> getCellId() {
-        return cellId;
-    }
-
-    public void setCellId(ArrayList<Long> cellId) {
-        this.cellId = cellId;
     }
 
     public String getAddress() {

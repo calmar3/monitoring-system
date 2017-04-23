@@ -1,5 +1,7 @@
 package core;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import control.AppConfigurator;
 import control.EnvConfigurator;
 import control.PerformanceWriter;
@@ -22,6 +24,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
+import java.io.File;
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +46,9 @@ public class MonitoringApp {
          * If we want to implement avl, this object will be loaded at start
          * from database
          */
-        //LampsAvl.getInstance().put(3L,3);
-        //LampsAvl.getInstance().put(2L,2);
-        //LampsAvl.getInstance().put(1L,1);
+		//LampsAvl.getInstance().put(3L,3);
+		//LampsAvl.getInstance().put(2L,2);
+		//LampsAvl.getInstance().put(1L,1);
 
 /*
 		// get a kafka consumer
@@ -62,21 +66,33 @@ public class MonitoringApp {
 
 		/**
 		 * Data for test configuration parameters
-		*/
+		 */
 
-		List<Lamp> data = new ArrayList<>();
+		ObjectMapper mapper = new ObjectMapper();
+
+		List<Lamp> data = mapper.readValue(new File("/Users/maurizio/Desktop/dataset.json"), new TypeReference<List<Lamp>>() {
+		});
+
+		int value = 10;
 
 		long lastSubDate = System.currentTimeMillis();
-		for(long i = 1; i <= 1000; i++){
-			data.add(new Lamp(1, i%2 == 0 ? 3 : 3 , "Roma", "via palmiro togliatti", lastSubDate, org.apache.hadoop.util.Time.now() + i*10000 + 1000));
-			data.add(new Lamp(2, i%2 == 0 ? 3 : 3 , "Roma", "via palmiro togliatti", lastSubDate, org.apache.hadoop.util.Time.now() + i*10000 + 2000));
-			data.add(new Lamp(3, i%2 == 0 ? 7 : 7 , "Roma", "via tuscolana", lastSubDate, org.apache.hadoop.util.Time.now() + i*10000 + 3000));
-			data.add(new Lamp(4, i%2 == 0 ? 7 : 7 , "Roma", "via tuscolana", lastSubDate, org.apache.hadoop.util.Time.now() + i*10000 + 4000));
+		for (int i = 0; i < data.size(); i++) {
+			data.get(i).setConsumption((i + 1) % 10 != 0 ? value + (i / 10) : value*2.5  + (i / 10));
+			data.get(i).setTimestamp(System.currentTimeMillis());
+			data.get(i).setResidualLifeTime(data.get(i).getTimestamp() - data.get(i).getLastSubstitutionDate());
+		}
+
+		for(int k = 1; k <= conf.ADD_TUPLE_FOR_TEST; k++) {
+			for (int i = 0; i < 1000; i++) {
+				data.add(data.get(i));
+				data.get(i + k*1000).setTimestamp(System.currentTimeMillis() + k*10000);
+				data.get(i + k*1000).setResidualLifeTime(data.get(i + k*1000).getTimestamp() - data.get(i).getLastSubstitutionDate());
+			}
 		}
 
 		DataStream<Lamp> lampStream = env.fromCollection(data).assignTimestampsAndWatermarks(new LampTSExtractor());
 
-		DataStream<Lamp> filteredById = lampStream.filter(new LampFilter());
+		DataStream<Lamp> filteredById = lampStream.filter(new LampFilter()).setParallelism(1);
 
 
 
@@ -92,13 +108,13 @@ public class MonitoringApp {
 		 *
 		 */
 		// filter data by threshold
-		DataStream<Lamp> filteredByThreshold = filteredById.filter(new ThresholdFilter(conf.THRESHOLD));
+		DataStream<Lamp> filteredByThreshold = filteredById.filter(new ThresholdFilter(conf.THRESHOLD)).setParallelism(1);
 
 		// grouping by lamp id and windowing the stream
 		WindowedStream rankWindowedStream = filteredByThreshold.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.RANK_WINDOW_SIZE));
 
 		// compute partial rank
-		SingleOutputStreamOperator partialRank = rankWindowedStream.apply(new LampRankerWF(conf.MAX_RANK_SIZE));
+		SingleOutputStreamOperator partialRank = rankWindowedStream.apply(new LampRankerWF(conf.MAX_RANK_SIZE)).setParallelism(1);
 		//partialRank.print();
 
 
@@ -185,9 +201,8 @@ public class MonitoringApp {
 		/**
 		 * 50 MEDIAN
 		 */
-
 		WindowedStream LampWindowedStream = filteredById.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.MEDIAN_WINDOW_SIZE), Time.seconds(conf.MEDIAN_WINDOW_SLIDE));
-		SingleOutputStreamOperator lampMedianStream = LampWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFF(), new MedianLampWF());
+		SingleOutputStreamOperator lampMedianStream = LampWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFF(), new MedianLampWF()).setParallelism(1);
 		//lampMedianStream.print();
 
 		AllWindowedStream globalWindowedStream = lampMedianStream.timeWindowAll(Time.seconds(conf.MEDIAN_WINDOW_SIZE),  Time.seconds(conf.MEDIAN_WINDOW_SLIDE));
@@ -198,17 +213,17 @@ public class MonitoringApp {
 		DataStream joinedMedianStream = joinedWindowedStream.apply(new LocalGlobalMedianJoin());
 
 		WindowedStream groupedStreet = joinedMedianStream.keyBy(new LampAddressKey2()).timeWindow(Time.seconds(conf.MEDIAN_WINDOW_SIZE*2));
-		SingleOutputStreamOperator percentualForStreet = groupedStreet.fold(new Tuple3<>(null, (long) 0,(long) 0), new MedianCountForPercentualFF(), new MedianPercentualWF());
+		SingleOutputStreamOperator percentualForStreet = groupedStreet.fold(new Tuple3<>(null, (long) 0,(long) 0), new MedianCountForPercentualFF(), new MedianPercentualWF()).setParallelism(1);
 		//percentualForStreet.print();
 
-		SingleOutputStreamOperator filteredPercForStreet = percentualForStreet.keyBy("f0").filter(new PercentualFilter());
+		SingleOutputStreamOperator filteredPercForStreet = percentualForStreet.keyBy("f0").filter(new PercentualFilter()).setParallelism(1);
 		//filteredPercForStreet.print();
 		//KafkaConfigurator.medianKafkaProducer(conf.MEDIAN_TOPIC, filteredPercForStreet);
 
 
-		//env.execute("Monitoring System");
+		env.execute("Monitoring System");
 
-		JobExecutionResult res = env.execute("Monitoring");
-		PerformanceWriter.write(res, "/Users/maurizio/Desktop/test.txt");
+		//JobExecutionResult res = env.execute("Monitoring");
+		//PerformanceWriter.write(res, "/Users/maurizio/Desktop/TestParallelism.txt");
 	}
 }
