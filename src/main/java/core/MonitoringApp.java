@@ -73,7 +73,7 @@ public class MonitoringApp {
 /*
 		ObjectMapper mapper = new ObjectMapper();
 
-		List<Lamp> data = mapper.readValue(new File("/Users/maurizio/Desktop/dataset.json"), new TypeReference<List<Lamp>>() {
+		List<Lamp> data = mapper.readValue(new File(AppConfigurator.DATASET_FILE), new TypeReference<List<Lamp>>() {
 		});
 
 		int value = 10;

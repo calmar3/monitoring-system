@@ -8,12 +8,13 @@ import java.util.Properties;
  */
 public class AppConfigurator {
 
-    public static final String FILENAME = "/Users/maurizio/Desktop/config.properties";
+    public static final String FILENAME = "/path/of/properties/config.properties";
 
     // watermark
     public static long WATERMARK_INTERVAL = 1000;
 
     // for testing
+    public static String DATASET_FILE = "/path/of/data/dataset.json";
     public static int ADD_TUPLE_FOR_TEST = 100;  //100k
 
     // zookeeper host & kafka broker
@@ -77,6 +78,7 @@ public class AppConfigurator {
             WATERMARK_INTERVAL = Long.parseLong(prop.getProperty("WATERMARK_INTERVAL"));
 
             // set tuple for test
+            DATASET_FILE = prop.getProperty("DATASET_FILE");
             ADD_TUPLE_FOR_TEST =  Integer.parseInt(prop.getProperty("ADD_TUPLE_FOR_TEST"));
 
             // zookeeper host & kafka broker
