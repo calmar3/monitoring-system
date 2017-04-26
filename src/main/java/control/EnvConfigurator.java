@@ -16,11 +16,11 @@ import java.util.List;
 public class EnvConfigurator {
 
     public static final StreamExecutionEnvironment setupExecutionEnvironment(/*AppConfiguration config*/) {
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(1);
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(3);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         // generate a Watermark every second
-        env.getConfig().setAutoWatermarkInterval(100);
+        env.getConfig().setAutoWatermarkInterval(1000);
 
         return env;
     }

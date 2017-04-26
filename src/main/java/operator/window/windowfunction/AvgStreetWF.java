@@ -17,7 +17,6 @@ public class AvgStreetWF implements WindowFunction<Tuple2<Street, Long>, Street,
     public void apply(String key, TimeWindow timeWindow, Iterable<Tuple2<Street, Long>> input, Collector<Street> out) throws Exception {
 
         Tuple2<Street, Long> avgConsStreet = input.iterator().next();
-
         //System.out.println("AvgLampWF result " + avgLamp.getConsumption() + " Timestamp " + avgLamp.getTimestamp());
         out.collect(avgConsStreet.f0.clone());
     }

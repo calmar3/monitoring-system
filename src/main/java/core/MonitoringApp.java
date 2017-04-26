@@ -23,6 +23,9 @@ import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
+import utils.connector.KafkaConfigurator;
 
 import java.io.File;
 import java.security.Timestamp;
@@ -50,7 +53,7 @@ public class MonitoringApp {
 		//LampsAvl.getInstance().put(2L,2);
 		//LampsAvl.getInstance().put(1L,1);
 
-/*
+
 		// get a kafka consumer
 		FlinkKafkaConsumer010<Lamp> kafkaConsumer = KafkaConfigurator.kafkaConsumer(conf.LAMP_DATA_TOPIC);
 
@@ -62,12 +65,12 @@ public class MonitoringApp {
 
 		// filter data
 		DataStream<Lamp> filteredById = lampStream.filter(new LampFilter());
-*/
+
 
 		/**
 		 * Data for test configuration parameters
 		 */
-
+/*
 		ObjectMapper mapper = new ObjectMapper();
 
 		List<Lamp> data = mapper.readValue(new File("/Users/maurizio/Desktop/dataset.json"), new TypeReference<List<Lamp>>() {
@@ -80,6 +83,8 @@ public class MonitoringApp {
 			data.get(i).setConsumption((i + 1) % 10 != 0 ? value + (i / 10) : value*2.5  + (i / 10));
 			data.get(i).setTimestamp(System.currentTimeMillis());
 			data.get(i).setResidualLifeTime(data.get(i).getTimestamp() - data.get(i).getLastSubstitutionDate());
+			if((i+1)%100 == 1)
+				data.get(i).setStateOn(false);
 		}
 
 		for(int k = 1; k <= conf.ADD_TUPLE_FOR_TEST; k++) {
@@ -87,21 +92,22 @@ public class MonitoringApp {
 				data.add(data.get(i));
 				data.get(i + k*1000).setTimestamp(System.currentTimeMillis() + k*10000);
 				data.get(i + k*1000).setResidualLifeTime(data.get(i + k*1000).getTimestamp() - data.get(i).getLastSubstitutionDate());
+				if((i+1)%100 == 1)
+					data.get(i + k*1000).setStateOn(false);
 			}
 		}
 
-		DataStream<Lamp> lampStream = env.fromCollection(data).assignTimestampsAndWatermarks(new LampTSExtractor());
+		DataStream<Lamp> lampStream = env.fromCollection(data).assignTimestampsAndWatermarks(new LampTSExtractor()).setParallelism(1);
 
 		DataStream<Lamp> filteredById = lampStream.filter(new LampFilter()).setParallelism(1);
-
-
-
+*/
 
 		/**
 		 * Warning for lamp stateOn
 		 */
-		//DataStream<Lamp> warningState = filteredById.filter(new StateOnFilter());
-		//KafkaConfigurator.lampKafkaProducer(conf.WARNING_STATE, warningState);
+		DataStream<Lamp> warningState = filteredById.filter(new StateOnFilter()).setParallelism(1);
+		KafkaConfigurator.lampKafkaProducer(conf.WARNING_STATE, warningState);
+		//warningState.print();
 
 		/**
 		 * INSERT CODE FOR RANKING
@@ -114,7 +120,7 @@ public class MonitoringApp {
 		WindowedStream rankWindowedStream = filteredByThreshold.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.RANK_WINDOW_SIZE));
 
 		// compute partial rank
-		SingleOutputStreamOperator partialRank = rankWindowedStream.apply(new LampRankerWF(conf.MAX_RANK_SIZE)).setParallelism(1);
+		SingleOutputStreamOperator partialRank = rankWindowedStream.apply(new LampRankerWF(conf.MAX_RANK_SIZE));
 		//partialRank.print();
 
 
@@ -127,7 +133,7 @@ public class MonitoringApp {
 		//updateGlobalRank.print();
 
 		// publish result on Kafka topic
-		//KafkaConfigurator.rankKafkaProducer(conf.RANK_TOPIC, updateGlobalRank);
+		KafkaConfigurator.rankKafkaProducer(conf.RANK_TOPIC, updateGlobalRank);
 
 
 		/**
@@ -137,21 +143,21 @@ public class MonitoringApp {
 		WindowedStream lampWindowedStreamHour = filteredById.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.HOUR_CONS_WINDOW_SIZE), Time.seconds(conf.HOUR_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsLampStreamHour = lampWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFF(), new AvgLampWF());
 		//avgConsLampStreamHour.print();
-		//KafkaConfigurator.lampKafkaProducer(conf.HOUR_LAMP_CONS, avgConsLampStreamHour);
+		KafkaConfigurator.lampKafkaProducer(conf.HOUR_LAMP_CONS, avgConsLampStreamHour);
 
 
 		// average consumption for lamp (day)
 		WindowedStream lampWindowedStreamDay = avgConsLampStreamHour.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.DAY_CONS_WINDOW_SIZE), Time.seconds(conf.DAY_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsLampStreamDay = lampWindowedStreamDay.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFF(), new AvgLampWF());
 		//avgConsLampStreamDay.print();
-		//KafkaConfigurator.lampKafkaProducer(conf.DAY_LAMP_CONS, avgConsLampStreamDay);
+		KafkaConfigurator.lampKafkaProducer(conf.DAY_LAMP_CONS, avgConsLampStreamDay);
 
 
 		// average consumption for lamp (week)
 		WindowedStream lampWindowedStreamWeek = avgConsLampStreamDay.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.WEEK_CONS_WINDOW_SIZE), Time.seconds(conf.WEEK_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsLampStreamWeek = lampWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new AvgConsLampFF(), new AvgLampWF());
 		//avgConsLampStreamWeek.print();
-		//KafkaConfigurator.lampKafkaProducer(conf.WEEK_LAMP_CONS, avgConsLampStreamWeek);
+		KafkaConfigurator.lampKafkaProducer(conf.WEEK_LAMP_CONS, avgConsLampStreamWeek);
 
 
 		/**
@@ -161,20 +167,20 @@ public class MonitoringApp {
 		WindowedStream streetWindowedStreamHour = avgConsLampStreamHour.keyBy(new LampAddressKey()).timeWindow(Time.seconds(conf.HOUR_CONS_WINDOW_SIZE), Time.seconds(conf.HOUR_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsStreetStreamHour = streetWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new AvgConStreetWarnFF(conf.WARNING_HOUR_TOPIC), new AvgStreetWF());
 		//avgConsStreetStreamHour.print();
-		//KafkaConfigurator.streetKafkaProducer(conf.HOUR_STREET_CONS, avgConsStreetStreamHour);
+		KafkaConfigurator.streetKafkaProducer(conf.HOUR_STREET_CONS, avgConsStreetStreamHour);
 
 
 		// average consumption by street (day)
 		WindowedStream streetWindowedStreamDay = avgConsLampStreamDay.keyBy(new LampAddressKey()).timeWindow(Time.seconds(conf.DAY_CONS_WINDOW_SIZE), Time.seconds(conf.DAY_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsStreetStreamDay = streetWindowedStreamDay.fold(new Tuple2<>(null, (long) 0), new AvgConStreetWarnFF(conf.WARNING_DAY_TOPIC), new AvgStreetWF());
 		//avgConsStreetStreamDay.print();
-		//KafkaConfigurator.streetKafkaProducer(conf.DAY_STREET_CONS, avgConsStreetStreamDay);
+		KafkaConfigurator.streetKafkaProducer(conf.DAY_STREET_CONS, avgConsStreetStreamDay);
 
 
 		WindowedStream streetWindowedStreamWeek = avgConsLampStreamWeek.keyBy(new LampAddressKey()).timeWindow(Time.seconds(conf.WEEK_CONS_WINDOW_SIZE), Time.seconds(conf.WEEK_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsStreetStreamWeek = streetWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new AvgConStreetWarnFF(conf.WARNING_WEEK_TOPIC), new AvgStreetWF());
 		//avgConsStreetStreamWeek.print();
-		//KafkaConfigurator.streetKafkaProducer(conf.WEEK_STREET_CONS, avgConsStreetStreamWeek);
+		KafkaConfigurator.streetKafkaProducer(conf.WEEK_STREET_CONS, avgConsStreetStreamWeek);
 
 
 		/**
@@ -184,46 +190,46 @@ public class MonitoringApp {
 		AllWindowedStream cityWindowedStreamHour = avgConsStreetStreamHour.timeWindowAll(Time.seconds(conf.HOUR_CONS_WINDOW_SIZE), Time.seconds(conf.HOUR_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsCityStreamHour = cityWindowedStreamHour.fold(new Tuple2<>(null, (long) 0), new AvgConsCityFF(), new AvgCityWF()).setParallelism(1);
 		//avgConsCityStreamHour.print();
-		//KafkaConfigurator.cityKafkaProducer(conf.HOUR_CITY_CONS, avgConsCityStreamHour);
+		KafkaConfigurator.cityKafkaProducer(conf.HOUR_CITY_CONS, avgConsCityStreamHour);
 
 
 		AllWindowedStream cityWindowedStreamDay = avgConsStreetStreamDay.timeWindowAll(Time.seconds(conf.DAY_CONS_WINDOW_SIZE), Time.seconds(conf.DAY_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsCityStreamDay = cityWindowedStreamDay.fold(new Tuple2<>(null, (long) 0), new AvgConsCityFF(), new AvgCityWF()).setParallelism(1);
 		//avgConsCityStreamDay.print();
-		//KafkaConfigurator.cityKafkaProducer(conf.DAY_CITY_CONS, avgConsCityStreamDay);
+		KafkaConfigurator.cityKafkaProducer(conf.DAY_CITY_CONS, avgConsCityStreamDay);
 
 		AllWindowedStream cityWindowedStreamWeek = avgConsStreetStreamWeek.timeWindowAll(Time.seconds(conf.WEEK_CONS_WINDOW_SIZE), Time.seconds(conf.WEEK_CONS_WINDOW_SLIDE));
 		SingleOutputStreamOperator avgConsCityStreamWeek = cityWindowedStreamWeek.fold(new Tuple2<>(null, (long) 0), new AvgConsCityFF(), new AvgCityWF()).setParallelism(1);
 		//avgConsCityStreamWeek.print();
-		//KafkaConfigurator.cityKafkaProducer(conf.WEEK_CITY_CONS, avgConsCityStreamWeek);
+		KafkaConfigurator.cityKafkaProducer(conf.WEEK_CITY_CONS, avgConsCityStreamWeek);
 
 
 		/**
 		 * 50 MEDIAN
 		 */
 		WindowedStream LampWindowedStream = filteredById.keyBy(new LampIdKey()).timeWindow(Time.seconds(conf.MEDIAN_WINDOW_SIZE), Time.seconds(conf.MEDIAN_WINDOW_SLIDE));
-		SingleOutputStreamOperator lampMedianStream = LampWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFF(), new MedianLampWF()).setParallelism(1);
+		SingleOutputStreamOperator lampMedianStream = LampWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFF(), new MedianLampWF());
 		//lampMedianStream.print();
 
 		AllWindowedStream globalWindowedStream = lampMedianStream.timeWindowAll(Time.seconds(conf.MEDIAN_WINDOW_SIZE),  Time.seconds(conf.MEDIAN_WINDOW_SLIDE));
-		SingleOutputStreamOperator globalMedianStream = globalWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFF(), new MedianGlobalWF()).setParallelism(1);
+		SingleOutputStreamOperator globalMedianStream = globalWindowedStream.fold(new Tuple2<>(null, null), new MedianConsLampFF(), new MedianGlobalWF());
 		//globalMedianStream.print();
 
 		JoinedStreams.WithWindow joinedWindowedStream = lampMedianStream.join(globalMedianStream).where(new LampCityKey()).equalTo(new LampCityKey()).window(TumblingEventTimeWindows.of(Time.seconds(conf.MEDIAN_WINDOW_SLIDE)));
 		DataStream joinedMedianStream = joinedWindowedStream.apply(new LocalGlobalMedianJoin());
 
 		WindowedStream groupedStreet = joinedMedianStream.keyBy(new LampAddressKey2()).timeWindow(Time.seconds(conf.MEDIAN_WINDOW_SIZE*2));
-		SingleOutputStreamOperator percentualForStreet = groupedStreet.fold(new Tuple3<>(null, (long) 0,(long) 0), new MedianCountForPercentualFF(), new MedianPercentualWF()).setParallelism(1);
+		SingleOutputStreamOperator percentualForStreet = groupedStreet.fold(new Tuple3<>(null, (long) 0,(long) 0), new MedianCountForPercentualFF(), new MedianPercentualWF());
 		//percentualForStreet.print();
 
 		SingleOutputStreamOperator filteredPercForStreet = percentualForStreet.keyBy("f0").filter(new PercentualFilter()).setParallelism(1);
 		//filteredPercForStreet.print();
-		//KafkaConfigurator.medianKafkaProducer(conf.MEDIAN_TOPIC, filteredPercForStreet);
+		KafkaConfigurator.medianKafkaProducer(conf.MEDIAN_TOPIC, filteredPercForStreet);
 
 
 		env.execute("Monitoring System");
 
 		//JobExecutionResult res = env.execute("Monitoring");
-		//PerformanceWriter.write(res, "/Users/maurizio/Desktop/TestParallelism.txt");
+		//PerformanceWriter.write(res, "/Users/maurizio/Desktop/TestParallelism.txt", data.size(), env.getParallelism());
 	}
 }

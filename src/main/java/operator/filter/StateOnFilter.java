@@ -2,6 +2,7 @@ package operator.filter;
 
 import model.Lamp;
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Created by maurizio on 14/04/17.

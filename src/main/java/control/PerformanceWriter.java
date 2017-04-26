@@ -14,16 +14,13 @@ import org.apache.flink.api.common.JobExecutionResult;
 
 public class PerformanceWriter {
 
-    public static void write(final JobExecutionResult res, final String path) {
+    public static void write(final JobExecutionResult res, final String path, long tuples, int parallelism) {
+
         double elapsed = res.getNetRuntime(TimeUnit.NANOSECONDS);
-        long tuples = 4000;//res.getAccumulatorResult("tuples");
         double latency = elapsed / tuples;
+        String performanceString = String.format("parallelism: %d tuples: %d elapsed: %.6f latency: %.6f", parallelism, tuples, elapsed / 1000000000.0, latency / 1000000000.0);
 
-        PerformanceWriter.write(path, tuples, elapsed, latency);
-    }
-
-    public static void write(final String path, long tuples, final double elapsed, final double latency) {
-        String performanceString = String.format("tuples: %d elapsed: %.6f latency: %.6f", tuples, elapsed / 1000000000.0, latency / 1000000000.0);
+        //System.out.println(performanceString);
 
         File file = new File(path);
         if (!file.exists()) {

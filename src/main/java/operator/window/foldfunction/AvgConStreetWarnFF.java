@@ -21,13 +21,10 @@ public class AvgConStreetWarnFF implements FoldFunction<Lamp, Tuple2<Street, Lon
     public Tuple2<Street, Long> fold(Tuple2<Street, Long> in, Lamp l) throws Exception {
 
         if(in.f0 != null) {
-            /*double delta = l.getConsumption() - in.f0.getConsumption();
-            if(delta > 0.5)
-                KafkaConfigurator.warningKafkaProducer(this.warnTopic, String.valueOf(l.getLampId()), l);
-            */
+
             double percentual = l.getConsumption()/in.f0.getConsumption();
-            if(percentual > 2 || percentual < 0.5) {}
-                //KafkaConfigurator.warningKafkaProducer(this.warnTopic, String.valueOf(l.getLampId()), l);
+            if(percentual > 2.5 || percentual < 0.4)
+                KafkaConfigurator.warningKafkaProducer(this.warnTopic, String.valueOf(l.getLampId()), l);
 
             return new Tuple2<>(new Street(l.getAddress(), in.f0.getConsumption() + (l.getConsumption() - in.f0.getConsumption())/(in.f1 + 1), l.getTimestamp()), in.f1 + 1);
         }

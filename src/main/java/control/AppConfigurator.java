@@ -10,8 +10,10 @@ public class AppConfigurator {
 
     public static final String FILENAME = "/Users/maurizio/Desktop/config.properties";
 
-    public static int ADD_TUPLE_FOR_TEST = 99;  //9k
+    // for testing
+    public static int ADD_TUPLE_FOR_TEST = 99;  //99k
 
+    // topic
     public static String LAMP_DATA_TOPIC = "lamp_data";
     public static String RANK_TOPIC = "rank";
 
@@ -51,28 +53,6 @@ public class AppConfigurator {
     // median
     public static long MEDIAN_WINDOW_SIZE = 10; //seconds
     public static long MEDIAN_WINDOW_SLIDE = 5; //seconds
-
-
-    /*
-	// ranking
-	private static final int MAX_RANK_SIZE = 3;
-	private static final long THRESHOLD = 1000;
-	private static final long RANK_WINDOW_SIZE = 10; //seconds
-
-	// avg Consumption
-	private static final long HOUR_CONS_WINDOW_SIZE = 3600; //seconds 1 hour
-	private static final long HOUR_CONS_WINDOW_SLIDE = 600; //seconds 10 minutes
-	private static final long DAY_CONS_WINDOW_SIZE = 1440; //minutes 24 hours
-	private static final long DAY_CONS_WINDOW_SLIDE = 240; //minutes 4 hours
-	private static final long WEEK_CONS_WINDOW_SIZE = 10080; //minutes 7 days
-	private static final long WEEK_CONS_WINDOW_SLIDE = 1440; //minutes 1 day
-
-	// median
-	private static final long MEDIAN_WINDOW_SIZE = 3600; //seconds 1 hour
-	private static final long MEDIAN_WINDOW_SLIDE = 600; //seconds 10 minutes
-*/
-
-
 
     public void readConfiguration() {
 
