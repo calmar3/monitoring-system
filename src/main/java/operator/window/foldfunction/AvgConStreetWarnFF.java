@@ -1,5 +1,6 @@
 package operator.window.foldfunction;
 
+import control.AppConfigurator;
 import model.Lamp;
 import model.Street;
 import org.apache.flink.api.common.functions.FoldFunction;
@@ -23,7 +24,7 @@ public class AvgConStreetWarnFF implements FoldFunction<Lamp, Tuple2<Street, Lon
         if(in.f0 != null) {
 
             double percentual = l.getConsumption()/in.f0.getConsumption();
-            if(percentual > 2.5 || percentual < 0.4)
+            if(percentual > AppConfigurator.WARNING_RATIO || percentual < (1/AppConfigurator.WARNING_RATIO))
                 KafkaConfigurator.warningKafkaProducer(this.warnTopic, String.valueOf(l.getLampId()), l);
 
             return new Tuple2<>(new Street(l.getAddress(), in.f0.getConsumption() + (l.getConsumption() - in.f0.getConsumption())/(in.f1 + 1), l.getTimestamp()), in.f1 + 1);

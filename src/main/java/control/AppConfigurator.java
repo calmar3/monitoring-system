@@ -10,8 +10,16 @@ public class AppConfigurator {
 
     public static final String FILENAME = "/Users/maurizio/Desktop/config.properties";
 
+    // watermark
+    public static long WATERMARK_INTERVAL = 1000;
+
     // for testing
-    public static int ADD_TUPLE_FOR_TEST = 99;  //99k
+    public static int ADD_TUPLE_FOR_TEST = 100;  //100k
+
+    // zookeeper host & kafka broker
+    public static String ZOOKEEPER_HOST = "localhost:2181";
+    public static String CONSUMER_KAFKA_BROKER = "localhost:9092";
+    public static String PRODUCER_KAFKA_BROKER = "localhost:9092";
 
     // topic
     public static String LAMP_DATA_TOPIC = "lamp_data";
@@ -36,7 +44,6 @@ public class AppConfigurator {
 
     public static String MEDIAN_TOPIC = "median";
 
-
     // ranking
     public static int MAX_RANK_SIZE = 3;
     public static long THRESHOLD = 1000; //milliseconds
@@ -54,7 +61,10 @@ public class AppConfigurator {
     public static long MEDIAN_WINDOW_SIZE = 10; //seconds
     public static long MEDIAN_WINDOW_SLIDE = 5; //seconds
 
-    public void readConfiguration() {
+    // warning
+    public static double WARNING_RATIO = 2.5;
+
+    public static void readConfiguration() {
 
         try {
             Properties prop = new Properties();
@@ -63,8 +73,16 @@ public class AppConfigurator {
 
             prop.load(inputStream);
 
-            //set tuple for test
+            // watermark
+            WATERMARK_INTERVAL = Long.parseLong(prop.getProperty("WATERMARK_INTERVAL"));
+
+            // set tuple for test
             ADD_TUPLE_FOR_TEST =  Integer.parseInt(prop.getProperty("ADD_TUPLE_FOR_TEST"));
+
+            // zookeeper host & kafka broker
+            ZOOKEEPER_HOST = prop.getProperty("ZOOKEEPER_HOST");
+            CONSUMER_KAFKA_BROKER = prop.getProperty("CONSUMER_KAFKA_BROKER");
+            PRODUCER_KAFKA_BROKER = prop.getProperty("PRODUCER_KAFKA_BROKER");
 
             // set topic
             LAMP_DATA_TOPIC = prop.getProperty("LAMP_DATA_TOPIC");
@@ -100,6 +118,9 @@ public class AppConfigurator {
             // set param for median
             MEDIAN_WINDOW_SIZE = Long.parseLong(prop.getProperty("MEDIAN_WINDOW_SIZE"));
             MEDIAN_WINDOW_SLIDE = Long.parseLong(prop.getProperty("MEDIAN_WINDOW_SLIDE"));
+
+            // warning
+            WARNING_RATIO = Double.parseDouble(prop.getProperty("WARNING_RATIO"));
 
             /*System.out.println(LAMP_DATA_TOPIC + "\n"
                                 + RANK_TOPIC + "\n"

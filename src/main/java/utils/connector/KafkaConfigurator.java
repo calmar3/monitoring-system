@@ -22,15 +22,22 @@ import java.util.TreeSet;
  */
 public class KafkaConfigurator {
 
-    private static final String LOCAL_ZOOKEEPER_HOST = "localhost:2181";
-    private static final String LOCAL_KAFKA_BROKER = "localhost:9092";
+    private static String ZOOKEEPER_HOST;
+    private static String CONSUMER_KAFKA_BROKER;
+    private static String PRODUCER_KAFKA_BROKER;
+
+    public static final void setConfiguration(String zookeperHost, String consumerBroker, String producerBroker) {
+        ZOOKEEPER_HOST = zookeperHost;
+        CONSUMER_KAFKA_BROKER = consumerBroker;
+        PRODUCER_KAFKA_BROKER = producerBroker;
+    }
 
     public static final FlinkKafkaConsumer010<Lamp> kafkaConsumer(String topic) {
 
         // configure the Kafka consumer
         Properties kafkaProps = new Properties();
-        kafkaProps.setProperty("zookeeper.connect", LOCAL_ZOOKEEPER_HOST);
-        kafkaProps.setProperty("bootstrap.servers", LOCAL_KAFKA_BROKER);
+        kafkaProps.setProperty("zookeeper.connect", ZOOKEEPER_HOST);
+        kafkaProps.setProperty("bootstrap.servers", CONSUMER_KAFKA_BROKER);
         kafkaProps.setProperty("group.id", "myGroup");
 
         // always read the Kafka topic from the start
@@ -50,7 +57,7 @@ public class KafkaConfigurator {
 
         //write data to a Kafka sink
         lampStream.addSink(new FlinkKafkaProducer010<>(
-                LOCAL_KAFKA_BROKER,
+                PRODUCER_KAFKA_BROKER,
                 topic,
                 new LampSchema()
         ));
@@ -62,7 +69,7 @@ public class KafkaConfigurator {
 
         //write data to a Kafka sink
         streetStream.addSink(new FlinkKafkaProducer010<>(
-                LOCAL_KAFKA_BROKER,
+                PRODUCER_KAFKA_BROKER,
                 topic,
                 new StreetSchema()
         ));
@@ -72,7 +79,7 @@ public class KafkaConfigurator {
 
         //write data to a Kafka sink
         streetStream.addSink(new FlinkKafkaProducer010<>(
-                LOCAL_KAFKA_BROKER,
+                PRODUCER_KAFKA_BROKER,
                 topic,
                 new CitySchema()
         ));
@@ -82,7 +89,7 @@ public class KafkaConfigurator {
 
         //write data to a Kafka sink
         lampRank.addSink(new FlinkKafkaProducer010<>(
-                LOCAL_KAFKA_BROKER,
+                PRODUCER_KAFKA_BROKER,
                 topic,
                 new LampRankSchema()
         )).setParallelism(1);
@@ -92,7 +99,7 @@ public class KafkaConfigurator {
 
         //write data to a Kafka sink
         lampStream.addSink(new FlinkKafkaProducer010<>(
-                LOCAL_KAFKA_BROKER,
+                PRODUCER_KAFKA_BROKER,
                 topic,
                 new MedianSchema()
         ));
@@ -100,7 +107,7 @@ public class KafkaConfigurator {
 
     public static final void warningKafkaProducer(String topic, String key, Lamp l) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", LOCAL_KAFKA_BROKER);
+        props.put("bootstrap.servers", PRODUCER_KAFKA_BROKER);
         props.put("acks", "all");
         props.put("retries", 0);
         props.put("batch.size", 16384);
