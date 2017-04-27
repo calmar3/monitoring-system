@@ -42,7 +42,7 @@ public class MonitoringApp {
 
 		AppConfigurator.readConfiguration();
 
-		KafkaConfigurator.setConfiguration(AppConfigurator.ZOOKEEPER_HOST, AppConfigurator.CONSUMER_KAFKA_BROKER, AppConfigurator.PRODUCER_KAFKA_BROKER);
+		KafkaConfigurator.setConfiguration(AppConfigurator.CONSUMER_ZOOKEEPER_HOST, AppConfigurator.CONSUMER_KAFKA_BROKER, AppConfigurator.PRODUCER_KAFKA_BROKER);
 
         /*
          * Unsafe Code
