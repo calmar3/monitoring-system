@@ -22,12 +22,12 @@ import java.util.TreeSet;
  */
 public class KafkaConfigurator {
 
-    private static String ZOOKEEPER_HOST;
+    private static String CONSUMER_ZOOKEEPER_HOST;
     private static String CONSUMER_KAFKA_BROKER;
     private static String PRODUCER_KAFKA_BROKER;
 
-    public static final void setConfiguration(String zookeperHost, String consumerBroker, String producerBroker) {
-        ZOOKEEPER_HOST = zookeperHost;
+    public static final void setConfiguration(String zookeeperHost, String consumerBroker, String producerBroker) {
+        CONSUMER_ZOOKEEPER_HOST = zookeeperHost;
         CONSUMER_KAFKA_BROKER = consumerBroker;
         PRODUCER_KAFKA_BROKER = producerBroker;
     }
@@ -36,7 +36,7 @@ public class KafkaConfigurator {
 
         // configure the Kafka consumer
         Properties kafkaProps = new Properties();
-        kafkaProps.setProperty("zookeeper.connect", ZOOKEEPER_HOST);
+        kafkaProps.setProperty("zookeeper.connect", CONSUMER_ZOOKEEPER_HOST);
         kafkaProps.setProperty("bootstrap.servers", CONSUMER_KAFKA_BROKER);
         kafkaProps.setProperty("group.id", "myGroup");
 

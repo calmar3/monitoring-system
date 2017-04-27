@@ -15,10 +15,10 @@ public class AppConfigurator {
 
     // for testing
     public static String DATASET_FILE = "/path/of/data/dataset.json";
-    public static int ADD_TUPLE_FOR_TEST = 100;  //100k
+    public static int NUMBER_OF_CONTACT = 1000;  //1000
 
     // zookeeper host & kafka broker
-    public static String ZOOKEEPER_HOST = "localhost:2181";
+    public static String CONSUMER_ZOOKEEPER_HOST = "localhost:2181";
     public static String CONSUMER_KAFKA_BROKER = "localhost:9092";
     public static String PRODUCER_KAFKA_BROKER = "localhost:9092";
 
@@ -79,10 +79,10 @@ public class AppConfigurator {
 
             // set tuple for test
             DATASET_FILE = prop.getProperty("DATASET_FILE");
-            ADD_TUPLE_FOR_TEST =  Integer.parseInt(prop.getProperty("ADD_TUPLE_FOR_TEST"));
+            NUMBER_OF_CONTACT =  Integer.parseInt(prop.getProperty("NUMBER_OF_CONTACT"));
 
             // zookeeper host & kafka broker
-            ZOOKEEPER_HOST = prop.getProperty("ZOOKEEPER_HOST");
+            CONSUMER_ZOOKEEPER_HOST = prop.getProperty("CONSUMER_ZOOKEEPER_HOST");
             CONSUMER_KAFKA_BROKER = prop.getProperty("CONSUMER_KAFKA_BROKER");
             PRODUCER_KAFKA_BROKER = prop.getProperty("PRODUCER_KAFKA_BROKER");
 
