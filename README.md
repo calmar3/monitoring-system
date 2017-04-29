@@ -11,19 +11,19 @@ Modificare in `src/main/java/control/AppConfigurator.java` il percorso nell'attr
 
 ---------------------------------------------------------------------------------------------------------------------
 
-# milliseconds time
+#milliseconds time
 WATERMARK_INTERVAL = 1000
 
-# tuple for testing
+#tuple for testing
 DATASET_FILE = /home/ec2-user/dataset.json
 NUMBER_OF_CONTACT = 1000
 
-# zookeeper host & kafka broker
+#zookeeper host & kafka broker
 CONSUMER_ZOOKEEPER_HOST = 54.161.196.192:2181
 CONSUMER_KAFKA_BROKER = 54.161.196.192:9092
 PRODUCER_KAFKA_BROKER = 54.152.81.214:9092
 
-# topic
+#topic
 LAMP_DATA_TOPIC = lamp_data
 RANK_TOPIC = rank
 WARNING_HOUR_TOPIC = warning_hour
@@ -41,13 +41,13 @@ DAY_CITY_CONS = day_city_cons
 WEEK_CITY_CONS = week_city_cons
 MEDIAN_TOPIC = median
 
-# rank
+#rank
 MAX_RANK_SIZE = 5
 
-# minimal time for computation of residual lifetime rank - milliseconds time
+#minimal time for computation of residual lifetime rank - milliseconds time
 THRESHOLD = 7889400000
 
-# seconds time
+#seconds time
 RANK_WINDOW_SIZE = 10
 
 #avg consumption - seconds time
@@ -58,11 +58,11 @@ DAY_CONS_WINDOW_SLIDE = 14400
 WEEK_CONS_WINDOW_SIZE = 604800
 WEEK_CONS_WINDOW_SLIDE = 86400
 
-# median - seconds time
+#median - seconds time
 MEDIAN_WINDOW_SIZE = 10
 MEDIAN_WINDOW_SLIDE = 5
 
-# warning
+#warning
 WARNING_RATIO = 2.5
 
 
