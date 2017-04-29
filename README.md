@@ -16,29 +16,47 @@ WATERMARK_INTERVAL = 1000
 
 ###### #tuple for testing
 DATASET_FILE = /home/ec2-user/dataset.json
+ 
 NUMBER_OF_CONTACT = 1000
 
 ###### #zookeeper host & kafka broker
 CONSUMER_ZOOKEEPER_HOST = 54.161.196.192:2181
+
 CONSUMER_KAFKA_BROKER = 54.161.196.192:9092
+
 PRODUCER_KAFKA_BROKER = 54.152.81.214:9092
 
 ###### #topic
 LAMP_DATA_TOPIC = lamp_data
+
 RANK_TOPIC = rank
+
 WARNING_HOUR_TOPIC = warning_hour
+
 WARNING_DAY_TOPIC = warning_day
+
 WARNING_WEEK_TOPIC = warning_week
+
 WARNING_STATE = warning_state
+
 HOUR_LAMP_CONS = hour_lamp_cons
+
 DAY_LAMP_CONS = day_lamp_cons
+
 WEEK_LAMP_CONS = week_lamp_cons
+
 HOUR_STREET_CONS = hour_street_cons
+
 DAY_STREET_CONS = day_street_cons
+
 WEEK_STREET_CONS = week_street_cons
+
 HOUR_CITY_CONS = hour_city_cons
+
 DAY_CITY_CONS = day_city_cons
+
 WEEK_CITY_CONS = week_city_cons
+
 MEDIAN_TOPIC = median
 
 ###### #rank
@@ -52,14 +70,20 @@ RANK_WINDOW_SIZE = 10
 
 ###### #avg consumption - seconds time
 HOUR_CONS_WINDOW_SIZE = 3600
+
 HOUR_CONS_WINDOW_SLIDE = 600
+
 DAY_CONS_WINDOW_SIZE = 86400
+
 DAY_CONS_WINDOW_SLIDE = 14400
+
 WEEK_CONS_WINDOW_SIZE = 604800
+
 WEEK_CONS_WINDOW_SLIDE = 86400
 
 ###### #median - seconds time
 MEDIAN_WINDOW_SIZE = 10
+
 MEDIAN_WINDOW_SLIDE = 5
 
 ###### #warning
