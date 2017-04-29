@@ -1,10 +1,7 @@
 package core;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import control.AppConfigurator;
 import control.EnvConfigurator;
-import control.PerformanceWriter;
 import model.Lamp;
 import operator.filter.*;
 import operator.flatmap.RankMerger;
@@ -16,7 +13,6 @@ import operator.key.LampIdKey;
 import operator.time.LampTSExtractor;
 import operator.window.foldfunction.*;
 import operator.window.windowfunction.*;
-import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.*;
@@ -27,11 +23,6 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 import utils.connector.KafkaConfigurator;
 
-import java.io.File;
-import java.security.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
 public class MonitoringApp {
 
 	@SuppressWarnings("unchecked")
@@ -41,8 +32,6 @@ public class MonitoringApp {
 		final StreamExecutionEnvironment env = EnvConfigurator.setupExecutionEnvironment();
 
 		AppConfigurator.readConfiguration();
-
-		KafkaConfigurator.setConfiguration(AppConfigurator.CONSUMER_ZOOKEEPER_HOST, AppConfigurator.CONSUMER_KAFKA_BROKER, AppConfigurator.PRODUCER_KAFKA_BROKER);
 
         /*
          * Unsafe Code
@@ -61,7 +50,7 @@ public class MonitoringApp {
 		FlinkKafkaConsumerBase<Lamp> kafkaConsumerTS = kafkaConsumer.assignTimestampsAndWatermarks(new LampTSExtractor());;
 
 		// add source
-		DataStream<Lamp> lampStream = env.addSource(kafkaConsumerTS);
+		DataStream<Lamp> lampStream = env.addSource(kafkaConsumerTS).setParallelism(1);
 
 		// filter data
 		DataStream<Lamp> filteredById = lampStream.filter(new LampFilter());
@@ -105,7 +94,7 @@ public class MonitoringApp {
 		/**
 		 * Warning for lamp stateOn
 		 */
-		DataStream<Lamp> warningState = filteredById.filter(new StateOnFilter()).setParallelism(1);
+		DataStream<Lamp> warningState = filteredById.filter(new StateOnFilter());
 		KafkaConfigurator.lampKafkaProducer(AppConfigurator.WARNING_STATE, warningState);
 		//warningState.print();
 

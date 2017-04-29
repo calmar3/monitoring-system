@@ -1,6 +1,5 @@
 package operator.filter;
 
-import utils.structure.LampsAvl;
 import model.Lamp;
 import org.apache.flink.api.common.functions.FilterFunction;
 
@@ -17,9 +16,7 @@ public final class LampFilter implements FilterFunction<Lamp> {
         /**
          * discard invalid tuple
          */
-        if (lamp == null) {
-            return false;
-        }
+        return (lamp!=null);
         /**
          * discard tuple not in avl
          */
@@ -29,10 +26,6 @@ public final class LampFilter implements FilterFunction<Lamp> {
             //lamp.toString();
             return true;
         }*/
-        else {
-            //System.out.println("\n\n\n\n\n\n\n\n\n" + lamp.toString() + "\n\n\n\n\n\n\n\n");
-            return true;
-        }
 
     }
 }

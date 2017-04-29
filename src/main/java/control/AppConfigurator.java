@@ -8,19 +8,19 @@ import java.util.Properties;
  */
 public class AppConfigurator {
 
-    public static final String FILENAME = "/path/of/properties/config.properties";
+    public static final String FILENAME = "/home/ec2-user/config.properties";
 
     // watermark
     public static long WATERMARK_INTERVAL = 1000;
 
     // for testing
-    public static String DATASET_FILE = "/path/of/data/dataset.json";
+    public static String DATASET_FILE = "/home/ec2-user/dataset.json";
     public static int NUMBER_OF_CONTACT = 1000;  //1000
 
     // zookeeper host & kafka broker
-    public static String CONSUMER_ZOOKEEPER_HOST = "localhost:2181";
-    public static String CONSUMER_KAFKA_BROKER = "localhost:9092";
-    public static String PRODUCER_KAFKA_BROKER = "localhost:9092";
+    public static String CONSUMER_ZOOKEEPER_HOST = "54.161.196.192:2181";
+    public static String CONSUMER_KAFKA_BROKER = "54.161.196.192:9092";
+    public static String PRODUCER_KAFKA_BROKER = "54.152.81.214:9092";
 
     // topic
     public static String LAMP_DATA_TOPIC = "lamp_data";

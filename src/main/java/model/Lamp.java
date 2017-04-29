@@ -3,9 +3,6 @@ package model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by maurizio on 21/03/17.
  */
@@ -162,11 +159,19 @@ public class Lamp implements Cloneable{
     
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.lampId).append(", ");
-        sb.append("Cons : ").append(this.consumption).append(", ");
-        sb.append(this.address).append(", ");
-        sb.append("timestamp : ").append(this.timestamp);
-        sb.append("city ").append(this.getCity());
+        sb.append("lampId : ").append(this.lampId).append(", ");
+        sb.append("consumption : ").append(this.consumption).append(", ");
+        sb.append("address : ").append(this.address).append(", ");
+        sb.append("city : ").append(this.city).append(", ");
+        sb.append("latitude : ").append(this.longitude).append(", ");
+        sb.append("longitude : ").append(this.latitude).append(", ");
+        sb.append("timestamp : ").append(this.timestamp).append(", ");
+        sb.append("lastSubstitutionDate : ").append(this.lastSubstitutionDate).append(", ");
+        sb.append("model : ").append(this.model).append(", ");
+        sb.append("stateOn : ").append(this.stateOn).append(", ");
+        sb.append("residualLifeTime : ").append(this.residualLifeTime).append(", ");
+        sb.append("lightIntensity : ").append(this.lightIntensity).append("\n\n\n ");
+
 
         return sb.toString();
     }
