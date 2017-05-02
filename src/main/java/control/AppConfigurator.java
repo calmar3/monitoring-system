@@ -46,8 +46,8 @@ public class AppConfigurator {
     public static String MEDIAN_TOPIC = "median";
 
     // ranking
-    public static int MAX_RANK_SIZE = 3;
-    public static long THRESHOLD = 1000; //milliseconds
+    public static int MAX_RANK_SIZE = 5;
+    public static long THRESHOLD = 1814400050; //milliseconds 3 settimane
     public static long RANK_WINDOW_SIZE = 10; //seconds
 
     // avg
@@ -59,8 +59,8 @@ public class AppConfigurator {
     public static long WEEK_CONS_WINDOW_SLIDE = 86400; //seconds 1 giorno
 
     // median
-    public static long MEDIAN_WINDOW_SIZE = 10; //seconds
-    public static long MEDIAN_WINDOW_SLIDE = 5; //seconds
+    public static long MEDIAN_WINDOW_SIZE = 3600; //seconds
+    public static long MEDIAN_WINDOW_SLIDE = 600; //seconds
 
     // warning
     public static double WARNING_RATIO = 2.5;

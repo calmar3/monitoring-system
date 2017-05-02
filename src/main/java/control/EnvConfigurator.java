@@ -13,7 +13,7 @@ public class EnvConfigurator {
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         // generate a Watermark every second
-        env.getConfig().setAutoWatermarkInterval(1000);
+        env.getConfig().setAutoWatermarkInterval(AppConfigurator.WATERMARK_INTERVAL);
 
         return env;
     }

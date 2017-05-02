@@ -103,7 +103,7 @@ public class MonitoringApp {
 		 *
 		 */
 		// filter data by threshold
-		DataStream<Lamp> filteredByThreshold = filteredById.filter(new ThresholdFilter(AppConfigurator.THRESHOLD)).setParallelism(1);
+		DataStream<Lamp> filteredByThreshold = filteredById.filter(new ThresholdFilter(AppConfigurator.THRESHOLD));
 
 		// grouping by lamp id and windowing the stream
 		WindowedStream rankWindowedStream = filteredByThreshold.keyBy(new LampIdKey()).timeWindow(Time.seconds(AppConfigurator.RANK_WINDOW_SIZE));
